@@ -1,0 +1,25 @@
+So far, I can see that, for the User page:
+                                           The Order section that has a list of their confirmed order, and where each order, upon clicked on, will display their order status.
+                                           The shopping cart section that has orders they want to place, alongside payment option.
+                                           A search bar that is in a single page called Search or sth that will also list of restaurants that users can scroll down
+                                           Some sort of button that will display a list of restaurants near them?
+And in each restaurant page:
+                                                          a "front-page" that shows the name and the pic of the restaurant.
+                                                          a menu button at the bottom of the front page that when clicked, display food selections, alongside another search bar allowing users to search food.
+And in each food page that will get upon clicking of one of the menu entries of a restaurant:
+                                                            a quantity of order, probably buttons denoting different sizes, and the Add to Shopping Cart button after all conditions are fulfilled. 
+For the Owner page:
+                                             The Order section that has a list of order confirmed in order of sent. They can also manually change the status of each order too.
+                                             A section that will receive incoming orders where the owner can either reject or accept it?
+                                             A Menu button that can lead to a Menu page where they can add their food and such?
+And in the Menu page, a add and remove food buttons:
+                                               Add: Allow owners to add their own food, probably with associating picture, alongside options they can offer + cost display
+                                               Remove: Remove the food entry from the menu.
+                                                Categorize: a button next to Add that allows owner to type in a food entry name and the tags they want the food to be associated with
+Generally,
+a login and register page, and the latter has two boxes that allow registrants to either register as an owner or a regular user. 
+
+I think that's the general gist of what tests we've made towards so far but I want to know if there are any changes that can be made to the critical components of each page. 
+Also, for the front-end language, should we use Django + Pytest, or React + Jest? I suppose for back-end, we can just use the usual Python for it.
+And Selenium at the end for more interactive testing such as clicking a button that gets a page and returns True or sth.
+Knowing the framework would also make it easier to design tests too
