@@ -10,7 +10,7 @@ And in each food page that will get upon clicking of one of the menu entries of 
                                                             a quantity of order, probably buttons denoting different sizes, and the Add to Shopping Cart button after all conditions are fulfilled. 
 For the Owner page:
                                              The Order section that has a list of order confirmed in order of sent. They can also manually change the status of each order too.
-                                             A section that will receive incoming orders where the owner can either reject or accept it?
+                                             An Incoming section where the owner can either reject or accept incoming orders.
                                              A Menu button that can lead to a Menu page where they can add their food and such?
 And in the Menu page, a add and remove food buttons:
                                                Add: Allow owners to add their own food, probably with associating picture, alongside options they can offer + cost display
