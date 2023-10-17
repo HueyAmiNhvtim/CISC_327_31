@@ -1,0 +1,33 @@
+[
+    {
+        "test_case_name": "Successful Search",
+        "input_data": {
+            "search_query": "Pizza"
+        },
+        "expected_output": {
+            "status": true,
+            "search_results": [
+                {
+                    "type": "Restaurant",
+                    "name": "Pizza Palace",
+                    "description": "Your favorite pizza place in town."
+                },
+                {
+                    "category": "Pizza",
+                    "name": "Pepperoni Pizza",
+                    "restaurant": "Pizza Hut"
+                }
+            ]
+        }
+    },
+    {
+        "test_case_name": "No Results Found",
+        "input_data": {
+            "search_query": "Burger"
+        },
+        "expected_output": {
+            "status": false,
+            "search_results": "No results found for 'Burger'."
+        }
+    }
+]

@@ -1,0 +1,25 @@
+[
+    {
+        "test_case_name": "Viewing Order History",
+        "input_data": {
+            "user_id": "12345"
+        },
+        "expected_output": {
+            "status": true,
+            "orders": [
+                {
+                    "order_date": "2023-09-01",
+                    "items_ordered": ["Pizza", "Burger", "Soda"],
+                    "order_status": "Delivered",
+                    "total_cost": "$25.99"
+                },
+                {
+                    "order_date": "2023-08-15",
+                    "items_ordered": ["Pasta", "Salad", "Iced Tea"],
+                    "order_status": "Canceled",
+                    "total_cost": "$18.50"
+                }
+            ]
+        }
+    }
+]

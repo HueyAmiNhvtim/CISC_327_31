@@ -1,0 +1,30 @@
+[
+    {
+        "test_case_name": "Order is Sent",
+        "input_data": {
+            "order_id": "123456"
+        },
+        "expected_output": "Sent"
+    },
+    {
+        "test_case_name": "Order is Received",
+        "input_data": {
+            "order_id": "100845"
+        },
+        "expected_output": "Received"
+        },
+    {
+        "test_case_name": "Order is Prepared",
+        "input_data": {
+            "order_id": "829343"
+        },
+        "expected_output": "Prepared"
+    },
+    {
+        "test_case_name": "Order is Delivered",
+        "input_data": {
+            "order_id": "789012"
+        },
+        "expected_output": "Delivered"
+    }
+]

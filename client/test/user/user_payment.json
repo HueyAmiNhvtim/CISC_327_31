@@ -1,0 +1,44 @@
+[
+    {
+    "test_case_name": "Test Case: Payment Processing - Successful Payment",
+    "input_data": {
+        "user_id": "12345",
+        "order_id": "67890",
+        "payment_method": "credit_card",
+        "card_details": "**** **** **** 1234",
+        "billing_address": "123 Main Street, Cityville"
+    },
+    "expected_output": {
+        "status": true,
+        "message": "Payment processed successfully."
+        }
+    },
+    {
+        "test_case_name": "Test Case: Payment Processing - Insufficient Funds",
+        "input_data": {
+            "user_id": "12345",
+            "order_id": "67890",
+            "payment_method": "debit_card",
+            "card_details": "**** **** **** 5678",
+            "billing_address": "123 Main Street, Cityville"
+        },
+        "expected_output": {
+            "status": false,
+            "message": "Insufficient funds for payment."
+        }
+    },
+    {
+        "test_case_name": "Test Case: Payment Processing - Invalid Information",
+        "input_data": {
+            "user_id": "12345",
+            "order_id": "67890",
+            "payment_method": "credit_card",
+            "card_details": "**** **** **** 5678",
+            "billing_address": "At my house"
+        },
+        "expected_output": {
+            "status": false,
+            "message": "Invalid information provided."
+        }
+    }
+]

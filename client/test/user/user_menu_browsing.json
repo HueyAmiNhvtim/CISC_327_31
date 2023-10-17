@@ -1,0 +1,13 @@
+[
+    {
+        "test_case_name":  "Accessing the menu of a selected restaurant",
+        "input_data": {
+            "menu_id": "menu"
+        },
+        "expected_output": {
+            "status": true,
+            "message": "Now browsing the menu",
+            "redirect": "/restaurant_name_here/menu/"
+        }
+    }
+]

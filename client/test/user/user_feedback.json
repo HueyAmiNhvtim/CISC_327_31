@@ -1,0 +1,17 @@
+[
+    {
+        "test_case_name": "Test Case: User Feedback - Scenario A",
+        "input_data": {
+            "order_id": "12345",
+            "feedback": "Excellent service and delicious food!",
+            "ratings": {
+            "quality": 5,
+            "delivery_experience": 4
+            }
+        },
+        "expected_output": {
+            "status": true,
+            "message": "Sent successfully."
+        }
+    }
+]

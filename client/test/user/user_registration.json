@@ -1,0 +1,27 @@
+[
+  {
+  "test_case_name": "Successful Registration with Valid Information",
+      "input_data": {
+          "username": "john_doe_123",
+          "email": "john_doe@gmail.com",
+          "password": "123456789"
+      },
+      "expected_output": {
+          "status": true,
+          "message": "Registration successful, redirecting to login page...",
+          "redirect": "/login"
+      }
+  },
+  {
+        "test_case_name": "Unsuccessful Registration with Invalid Information",
+        "input_data": {
+            "username": "john_doe_123",
+            "email": "johnatgmaildotcom",
+            "password": "123456789"
+        },
+        "expected_output": {
+            "status": false,
+            "message": "Invalid information provided."
+        }
+  }
+]

@@ -1,0 +1,35 @@
+[
+	{
+		"test_case_name":  "Item and Category Exists",
+		"input_data": {
+            "item": "cupcakes",
+            "category": "dessert"
+        },
+		"expected_output": {
+            "status": true,
+            "message": "'cupcakes' has been assigned category 'dessert'"
+        }
+    },
+	{
+		"test_case_name":  "Item Does Not Exist",
+		"input_data": {
+            "item": "surströmming",
+            "category": "dessert"
+        },
+		"expected_output": {
+				"status": false,
+				"message": "'surströmming' does not exist."
+        }
+    },
+	{
+		"test_case_name":  "Category Does Not Exist",
+		"input_data": {
+            "item": "cupcakes",
+            "category": "arquebus"
+        },
+		"expected_output": {
+            "status": false,
+            "message":  "Category 'arquebus' does not exist."
+        }
+    }
+]

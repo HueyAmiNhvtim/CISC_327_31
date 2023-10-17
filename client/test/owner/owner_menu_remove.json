@@ -1,0 +1,22 @@
+[
+	{
+        "test_case_name": "Entry Exists",
+        "input_data": {
+            "item": "Apple"
+        },
+		"expected_output": {
+			"status": true,
+			"message": "Apple has successfully been removed from the menu."
+        }
+    },
+    {
+	    "test_case_name": "Entry Does Not Exist",
+	    "input_data": {
+            "item": "Mangosteen"
+        },
+		"expected_output": {
+			"status": false,
+			"message": "Mangosteen does not exist."
+        }
+    }
+]

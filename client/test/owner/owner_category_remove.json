@@ -1,0 +1,23 @@
+[
+    {
+        "test_case_name":  "Category Exists",
+        "input_data": {
+            "category": "dessert"
+        },
+        "expected_output": {
+                "status": true,
+                "message": "'dessert' has been removed."
+        }
+    },
+    {
+        "test_case_name":  "Category Does Not Exist",
+        "input_data": {
+            "category": "balam"
+        },
+        "expected_output": {
+            "status": false,
+            "message": "'balam' category does not exist."
+        }
+    }
+]
+

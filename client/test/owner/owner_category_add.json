@@ -1,0 +1,33 @@
+[
+	{
+		"test_case_name":  "Regular case",
+		"input_data": {
+            "category": "Dessert"
+        },
+		"expected_output": {
+            "status": true,
+            "message": "Category Dessert has been created."
+        }
+    },
+	{
+		"test_case_name":  "Category Already Exists",
+		"input_data": {
+            "category": "Dessert"
+        },
+		"expected_output": {
+            "status": false,
+            "message": "Category Dessert has already been created."
+        }
+    },
+    {
+        "test_case_name":  "No Category Name Provided",
+        "input_data": {
+            "category": ""
+        },
+        "expected_output": {
+            "status": false,
+            "message": "No category name was provided."
+        }
+    }
+]
+

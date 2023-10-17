@@ -1,0 +1,43 @@
+[
+    {
+        "test_case_name": "Test Case: Placing an Order - Scenario A",
+        "input_data": {
+            "selected_restaurant": "Restaurant XYZ",
+        "order_items": [
+                {
+                    "item_name": "Pizza",
+                    "quantity": 2,
+                    "special_request": "Extra cheese"
+                },
+                {
+                    "item_name": "Burger",
+                "quantity": 1,
+                    "special_request": ""
+                }
+            ],
+            "delivery_address": "123 Main St",
+            "payment_method": "Credit Card"
+        },
+        "expected_output": {
+            "status": true,
+            "message": "Your order has been successfully placed.",
+            "order_details": {
+                "restaurant": "Restaurant XYZ",
+                "items": [
+                    {
+                        "item_name": "Pizza",
+                        "quantity": 2,
+                        "special_request": "Extra cheese"
+                    },
+                    {
+                        "item_name": "Burger",
+                        "quantity": 1,
+                        "special_request": ""
+                    }
+            ],
+            "delivery_address": "123 Main St",
+            "payment_method": "Credit Card"
+            }
+        }
+    }
+]

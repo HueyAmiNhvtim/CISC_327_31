@@ -1,0 +1,73 @@
+[    {
+        "test_case_name": "Successful Login with Username",
+        "input_data": {
+            "username_or_email": "john_doe_123",
+            "password": "123456789"
+        },
+        "expected_output": {
+            "status": true,
+            "message": "Successfully logged in.",
+            "redirect": "/home"
+        }
+    },
+    {
+        "test_case_name": "Successful Login with Email",
+        "input_data": {
+            "username_or_email": "john_doe@gmail.com",
+            "password": "123456789"
+        },
+        "expected_output": {
+            "status": true,
+            "message": "Successfully logged in.",
+            "redirect": "/home"
+        }
+    },
+    {
+        "test_case_name": "Unsuccessful Login with Nonexistent Username",
+        "input_data": {
+            "username_or_email": "Sdasdasdasdsad",
+            "password": "123456789"
+        },
+        "expected_output": {
+            "status": false,
+            "message": "Username/Email and password do not match."
+        }
+    },
+    {
+        "test_case_name": "Unsuccessful Login with Nonexistent Email",
+        "input_data": {
+            "username_or_email": "sdas@yahoo.ca",
+            "password": "123456789"
+        },
+        "expected_output": {
+            "status": false,
+            "message": "Username/Email and password do not match."
+        }
+    },
+    {
+        "test_case_name": "Unsuccessful Login with Username and Password That do not Match",
+        "input_data": {
+            "username_or_email": "John_doer_456",
+            "password": "123456789"
+        },
+        "expected_output": {
+            "status": false,
+            "message": "Username/Email and password do not match."
+        }
+    },
+    {
+        "test_case_name": "Unsuccessful Login with Email and Password That do not Match",
+        "input_data": {
+            "username_or_email": "john_doer@gmail.com",
+            "password": "123456789"
+        },
+        "expected_output": {
+        "status": false,
+        "message": "Username/Email and password do not match."
+        }
+    }
+]
+
+
+
+

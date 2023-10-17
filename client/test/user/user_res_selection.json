@@ -1,0 +1,13 @@
+[
+    {
+        "test_case_name": "Selecting a Restaurant",
+        "input_data": {
+        "restaurant": "Fruit Market"
+        },
+        "expected_output": {
+            "status": true,
+            "message": "Now browsing Fruit Market",
+            "redirect": "/restaurants/100345"
+        }
+    }
+]

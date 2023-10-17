@@ -1,0 +1,58 @@
+[
+    {
+        "test_case_name": "From Device - Success",
+        "input_data": {
+            "street": "21-25 Union Street",
+            "postal_code": "K7L 2N8",
+            "city": "Kingston",
+            "province_or_state": "Ontario",
+            "country": "Canada"
+        },
+        "expected_output": {
+            "status": true,
+            "message": "Searching for local restaurants..."
+        }
+    },
+    {
+        "test_case_name": "From Device - Fail",
+        "input_data": {
+            "street": "",
+            "postal_code": "",
+            "city": "",
+            "province_or_state": "",
+            "country": ""
+        },
+        "expected_output": {
+            "status": false,
+            "message": "Invalid location entered."
+        }
+    },
+    {
+        "test_case_name": "Manual entry - Success",
+        "input_data": {
+            "street": "290 Bremner Blvd",
+            "postal_code": "M5V 3L9",
+            "city": "Toronto",
+            "province_or_state": "Ontario",
+            "country": "Canada"
+        },
+        "expected_output": {
+            "status": true,
+            "message": "Searching for local restaurants..."
+        }
+    },
+    {
+        "test_case_name": "Manual Entry - Fail",
+        "input_data": {
+            "street": "abcd",
+            "postal_code": "efgh",
+            "city": "ijkl",
+            "province_or_state": "mnop",
+            "country": "qrst"
+        },
+        "expected_output": {
+            "status": false,
+            "message": "Invalid location entered."
+        }
+    }
+]

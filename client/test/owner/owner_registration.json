@@ -1,0 +1,51 @@
+[
+	{
+        "test_case_name": "Regular Case",
+        "input_data": {
+             "restaurant_name": "Fruit Market",
+             "restaurant_location": "1234 Street Street, Kingston, Ontario, Canada",
+             "restaurant_type": "Groceries",
+             "restaurant_description": "We sell fruits!",
+             "owner_name": "John Core",
+             "owner_email": "jcore@gmail.com",
+             "proof": "official_documents.pdf"
+        },
+        "expected_output": {
+            "status": true,
+            "redirect": "/login",
+            "message": "Successfully registered!"
+        }
+    },
+    {
+        "test_case_name": "Entry Already Exists",
+        "input_data": {
+             "restaurant_name": "Fruit Market",
+             "restaurant_location": "1234 Street Street, Kingston, Ontario, Canada",
+             "restaurant_type": "Groceries",
+             "restaurant_description": "We sell fruits!",
+             "owner_name": "John Core",
+             "owner_email": "jcore@gmail.com",
+             "proof": "official_documents.pdf"
+        },
+        "expected_output": {
+            "status": false,
+            "message": "Restaurant already exists."
+        }
+    },
+    {
+        "test_case_name": "One or More Arguments are Invalid",
+        "input_data": {
+             "restaurant_name": "Fruit Market",
+             "restaurant_location:": "1234 Street Street, Kingston, Ontario, Canada",
+             "restaurant_type": "Groceries",
+             "restaurant_description": "We sell fruits!",
+             "owner_name": "John Core",
+             "owner_email": "invalid_email.com",
+             "proof": "official_documents.pdf"
+        },
+        "expected_output": {
+            "status": false,
+            "message": "One or more entries are invalid."
+        }
+    }
+]

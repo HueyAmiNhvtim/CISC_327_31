@@ -1,0 +1,24 @@
+[
+    {
+        "test_case_name": "Test Case: Remove Items from Shopping Cart - Scenario A",
+        "input_data": {
+          "item_id": "12345"
+        },
+        "expected_output": {
+            "status": true,
+            "message": "Successfully removed item from the shopping cart.",
+            "cart_items": [
+                {
+                  "item_name": "Apple",
+                  "item_price": "$1.99",
+                  "quantity": 3
+                },
+                {
+                  "item_name": "Banana",
+                  "item_price": "$0.99",
+                  "quantity": 2
+                }
+            ]
+        }
+    }
+]

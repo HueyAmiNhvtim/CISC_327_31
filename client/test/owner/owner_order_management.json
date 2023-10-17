@@ -1,0 +1,51 @@
+[
+	{
+		"test_case_name": "Accept Incoming Order",
+		"input_data": {
+            "order_id": "123456",
+            "note": ""
+        },
+		"expected_output": {
+			"paid": true,
+			"status": true,
+			"order_status": "accepted",
+            "items": [
+                    {
+                        "item_name": "Pizza",
+                        "quantity": 2,
+                        "special_request": "Extra cheese"
+                    },
+                    {
+                        "item_name": "Burger",
+                        "quantity": 1,
+                        "special_request": ""
+                    }
+            ]
+        }
+    },
+    {
+        "test_case_name": "Reject Incoming Order",
+        "input_data": {
+                "order_id": "654321",
+                "note": "welp, we ran out of ingredients for this one. Sorry."
+                },
+        "expected_output": {
+            "status": true,
+            "order_status": "rejected",
+            "message": "Order rejected. Message sent."
+        }
+    },
+	{
+        "test_case_name": "Reject Accepted Order",
+        "input_data": {
+            "order_id": "123456",
+            "note": "welp, we ran out of ingredients in the middle of cooking for this one. Sorry."
+        },
+        "expected_output": {
+                "status": true,
+                "order_status": "rejected",
+                "refund": true,
+                "message": "Order rejected. Message sent"
+            }
+        }
+]

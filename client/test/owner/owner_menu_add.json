@@ -1,0 +1,28 @@
+[
+    {
+        "test_case_name": "Item Does Not Already Exist",
+        "input_data": {
+             "item": "Apple",
+             "price": 0.99,
+             "description": "A fresh red delicious apple",
+             "image": "Apple.jpg-path"
+        },
+        "expected_output": {
+            "status": true,
+            "message": "Apple has been successfully added to the menu."
+        }
+    },
+    {
+        "test_case_name": "Item Already Exists",
+        "Input_data": {
+             "item": "Apple",
+             "price": 0.99,
+             "description": "A fresh red delicious apple",
+             "image": "Apple.jpg-path"
+        },
+        "expected_output": {
+            "status": false,
+            "message": "Apple already exists in the menu."
+        }
+    }
+]
