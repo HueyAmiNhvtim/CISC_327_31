@@ -41,7 +41,8 @@ class Menu(models.Model):
     Each restaurant has a menu table associating with it.
     """
     food = models.CharField(max_length=200)
-    # a food item can have multiple categories, hence the extended max_length
+    # a food item can have multiple categories, hence the extended max_length to
+    # contain the concatenated string of categories
     categories = models.CharField(max_length=500)
 
     restaurant_owning_menu = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
