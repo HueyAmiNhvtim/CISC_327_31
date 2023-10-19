@@ -19,6 +19,11 @@
                     <form action="{% url 'res_owner:edit_restaurant' restaurant.id %}" method="get">
                         <button name="edit_res_button">Edit?</button>
                     </form>
+                    <!--Button for deleting-->
+                    <form action="{% url 'res_owner:delete_restaurant' restaurant.id %}" method="post">
+                        {% csrf_token %}
+                        <button name="delete_res_button">Delete?</button>
+                    </form>
                 </li>
             {% endfor %}
         </ul>

@@ -12,6 +12,8 @@ urlpatterns = [
     path('edit_restaurant/<int:restaurant_id>', views.edit_restaurant, name='edit_restaurant'),
     # Page for adding in a new restaurant
     path('new_restaurant', views.new_restaurant, name='new_restaurant'),
+    # Page for deleting the restaurant entry
+    path('remove_restaurant/<int:restaurant_id>', views.delete_restaurant, name='delete_restaurant'),
 
     # Page for each restaurant
     path('restaurants/<int:restaurant_id>/', views.restaurant, name='restaurant'),

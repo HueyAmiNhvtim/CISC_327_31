@@ -144,3 +144,14 @@ def edit_restaurant(request, restaurant_id: int):
     # This sends the context to render the edit_restaurant.html
     context = {'form': form, 'restaurant': this_restaurant}
     return render(request, 'res_owner/edit_restaurant.html', context)
+
+
+def delete_restaurant(request, restaurant_id: int):
+    """
+    The page for deleting an existing restaurant entry.
+    :param request: a Request object specific to Django
+    :param restaurant_id: the id of the restaurant in the Restaurant table to delete
+    """
+    if request.method == 'POST':
+        Restaurant.objects.filter(id=restaurant_id).delete()
+    return redirect('res_owner:res_home_page')
