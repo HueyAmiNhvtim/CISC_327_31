@@ -41,6 +41,23 @@ class Restaurant(models.Model):
         return self.name
 
 
+class Category(models.Model):
+    """
+    A model representation of a food category
+    A food item can have multiple categories.
+    A category can have multiple food items associating with it.
+    """
+    name = models.CharField(max_length=200, primary_key=True)
+
+    class Meta:
+        """Holds extra information for managing a model"""
+        verbose_name_plural = "Categories"
+
+    def __str__(self):
+        """Return the name of the category"""
+        return self.name
+
+
 class Food(models.Model):
     """
     A model representation of a food item.
@@ -48,15 +65,11 @@ class Food(models.Model):
     that restaurant's menu.
     """
     name = models.CharField(max_length=200)
-    # a food item can have multiple categories, hence the extended max_length to
-    # contain the concatenated string of categories
-    categories = models.CharField(max_length=500)
+    categories = models.ManyToManyField(Category)
 
     restaurant_owning_food = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
 
     def __str__(self):
         """Return the name of the food"""
         return self.name
-
-
 
