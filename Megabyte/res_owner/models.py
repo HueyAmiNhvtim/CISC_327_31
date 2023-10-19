@@ -30,9 +30,15 @@ class Restaurant(models.Model):
     name = models.CharField(max_length=200)
     location = models.CharField(max_length=200)  # May subject to change
     # Path to the image representation of the restaurant
-    image_path = models.CharField(max_length=200)
+    # Only change to FilePathField when you have the actual locations.
+    # Else, it will result in errors. When changed, make sure to change
+    # every other image_path of Restaurants created in admin page to valid file paths
+    # as well.
+    image_path = models.CharField(max_length=100)
 
-    restaurant_owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    # This will have to be changed once custom User registrations are implemented
+    # Delete blank and null once that happens
+    restaurant_owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
 
     # restaurant_owner = models.ForeignKey(RestaurantOwner, on_delete=models.CASCADE)
 
@@ -77,7 +83,11 @@ class Category(models.Model):
         return self.name
 
     def __eq__(self, other):
+        """Return a boolean if objects have same name"""
+        if type(other) != Category:
+            return False
         return other.name == self.name
 
     def __hash__(self):
+        """For equality comparison"""
         return hash(self.name)

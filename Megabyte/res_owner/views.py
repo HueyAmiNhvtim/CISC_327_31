@@ -1,5 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import RestaurantOwner, Restaurant, Food, Category
+from .forms import RestaurantForm, FoodForm, CategoryForm
 # Create your views here.
 
 
@@ -81,3 +82,38 @@ def cat_others(request, restaurant_id: int):
         'restaurant_name': this_restaurant.name
     }
     return render(request, 'res_owner/category.html', context)
+
+
+def res_settings(request):
+    """
+    The page for managing the restaurants
+    :param request: a Request object specific to Django
+    """
+    restaurants = Restaurant.objects.order_by('name')
+    # restaurants = Restaurant.objects.filter(owner=request.user).order_by('name')
+    # For when user is working
+    context = {
+        'restaurants': restaurants
+    }
+    return render(request, 'res_owner/res_settings.html', context)
+
+
+def new_restaurant(request):
+    """
+    The page for adding in a new restaurant.
+    :param request: a Request object specific to Django
+    """
+    if request.method != 'POST':
+        # Blank form
+        form = RestaurantForm()
+    else:
+        # POST request type confirmed; processing data
+        form = RestaurantForm(data=request.POST)
+        # Might have to change it once custom form validation is implemented.
+        if form.is_valid():
+            new_restaurant = form.save(commit=False)
+            # new_restaurant.restaurant_owner = request.owner
+            new_restaurant.save()  # Save to the database
+            return redirect('res_owner:res_home_page')
+    context = {'form': form}
+    return render(request, 'res_owner/new_restaurant.html', context)

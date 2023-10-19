@@ -7,7 +7,7 @@
 <body>
     {% extends 'res_owner/base.html' %}
     {% block content %}
-        <p>All restaurants</p>
+        <p>All restaurants, but now you can remove/edit/add</p>
         <!--Display all restaurants in an unordered list-->
         <ul>
             <!-- restaurants variable is supposed to be part of the context dictionary! -->
@@ -20,14 +20,12 @@
             {% endfor %}
         </ul>
     {% endblock content %}
-    <!--Has to be within a block-->
     {% block settings %}
         <hr />
-        <form action="{% url 'res_owner:res_settings' %}" method="get">
+        <form action="{% url 'res_owner:new_restaurant' %}" method="get">
             {% csrf_token %}
-            <button name="res_settings_button">Restaurant Settings</button>
+            <button name="new_res_button"> Add Restaurant? </button>
         </form>
     {% endblock settings %}
 </body>
-    <!-- including settings where you can change, modify owner's info, and modify restaurant's info-->
 </html>
