@@ -5,6 +5,21 @@
     <title>Title</title>
 </head>
 <body>
-
+    {% extends 'res_owner/base.html' %}
+    {% block content %}
+        <p>All categories</p>
+        <!--Display all restaurants in an unordered list-->
+        <ul>
+            <!-- restaurants variable is supposed to be part of the context dictionary! -->
+            {% for category in categories %}
+                <li>
+                    <p>{{ category }}</p> <!--Will be a tag once I got the Restaurant page down-->
+                </li>
+            {% endfor %}
+            <li>
+                <p>Others</p>
+            </li>
+        </ul>
+    {% endblock content %}
 </body>
 </html>
