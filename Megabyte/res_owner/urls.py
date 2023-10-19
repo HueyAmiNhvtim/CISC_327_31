@@ -6,5 +6,7 @@ from . import views
 app_name = 'res_owner'
 urlpatterns = [
     # Home_page for restaurant owners
-    path('', views.res_home_page, name='res_home_page')
+    path('', views.res_home_page, name='res_home_page'),
+    # Page for each restaurant
+    path('restaurants/<int:restaurant_id>', views.restaurant, name='restaurants')
 ]

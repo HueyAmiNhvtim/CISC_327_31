@@ -19,5 +19,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # I'm not too sure about this...Should we have a separate home page to show different
+    # pages for different kinds of users using the same URL?
     path('res_owner/', include('res_owner.urls'))
 ]
