@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    {% extends 'res_owner/base.html' %}
+</body>
+    {% block content %}
+        <p>All restaurants</p>
+        <!--Display all restaurants in an unordered list-->
+        <ul>
+            <!-- restaurants variable is supposed to be part of the context dictionary! -->
+            {% for restaurant in restaurants %}
+                <li>
+                    <p>{{ restaurant.name }}</p> <!--Will be a tag once I got the Restaurant page down-->
+                </li>
+            {% endfor %}
+        </ul>
+    {% endblock content %}
+    <!-- including settings where you can change, modify restaurants, and modify owner's own info-->
+</html>
