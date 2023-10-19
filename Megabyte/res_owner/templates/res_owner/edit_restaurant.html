@@ -5,6 +5,15 @@
     <title>Title</title>
 </head>
 <body>
-
+    {% extends 'res_owner/base.html' %}
+    {% block content %}
+        <p>Edit restaurant {{ restaurant.name }}'s info here:</p>
+        <!-- Send the form back to the edit_entry() view function for processing -->
+        <form action="{% url 'res_owner:edit_restaurant' restaurant.id %}" method="post">
+            {% csrf_token %}
+            {{ form.as_div }}
+            <button name="edit_res_button">Save changes</button>
+        </form>
+    {% endblock content %}
 </body>
 </html>

@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import RestaurantOwner, Restaurant, Food, Category
 from .forms import RestaurantForm, FoodForm, CategoryForm
+from django.http import Http404
 # Create your views here.
 
 
@@ -117,3 +118,29 @@ def new_restaurant(request):
             return redirect('res_owner:res_home_page')
     context = {'form': form}
     return render(request, 'res_owner/new_restaurant.html', context)
+
+
+def edit_restaurant(request, restaurant_id: int):
+    """
+    The page for editing an existing restaurant entry.
+    :param request: a Request object specific to Django
+    :param restaurant_id: the id of the restaurant in the Restaurant table
+    """
+    this_restaurant = Restaurant.objects.get(id=restaurant_id)
+
+    # Uncomment when user registration is completed
+    # if this_restaurant.restaurant_owner != request.user:
+    #     raise Http404
+    if request.method != 'POST':
+        # Initial request: Pre-fill form with the current entry
+        form = RestaurantForm(instance=this_restaurant)
+    else:
+        # POST request type confirmed, process data
+        form = RestaurantForm(instance=this_restaurant, data=request.POST)
+        # Might have to change it once custom form validation is implemented.
+        if form.is_valid():
+            form.save()
+            return redirect('res_owner:res_home_page')
+    # This sends the context to render the edit_restaurant.html
+    context = {'form': form, 'restaurant': this_restaurant}
+    return render(request, 'res_owner/edit_restaurant.html', context)
