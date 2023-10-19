@@ -19,20 +19,65 @@ def res_home_page(request):
 def restaurant(request, restaurant_id: int):
     """
     The page for each restaurant.
-    Show the menu
+    Show all the categories of a restaurant
     :param request: a Request object specific to Django
     :param restaurant_id: the id of the restaurant in the Restaurant table
     """
     this_restaurant = Restaurant.objects.get(id=restaurant_id)
     foods = this_restaurant.food_set.all()
-    # Find out how to get the categories through the restaurant's food...
-    # Use Django shell for this shite.
+
     # Find all categories in all food of a restaurant.
     res_category = set()
     for food in foods:
-        for category in food.category_set.all():
-            res_category.add(category.name)
-    sorted_category = sorted(list(res_category))
-    print(sorted_category)
-    context = {"categories": sorted_category}
+        for food_category in food.category_set.all():
+            res_category.add(food_category)
+    sorted_category = sorted(list(res_category), key=lambda x: x.name)
+    context = {
+        'categories': sorted_category,
+        'restaurant_name': this_restaurant.name,
+        'restaurant_id': restaurant_id
+    }
     return render(request, 'res_owner/restaurant.html', context)
+
+
+def category(request, category_name: str, restaurant_id: int):
+    """
+    The page for each category.
+    Show all foods associated with that category in the restaurant
+    :param request: a Request object specific to Django
+    :param category_name: the name of the category in the Category table
+    :param restaurant_id: the id of the restaurant in the Restaurant table
+    """
+    this_category = Category.objects.get(name=category_name)
+    foods = this_category.food.all()
+    restaurant_name = foods[0].restaurant.name
+    sorted_food = sorted(list(foods), key=lambda a: a.name)
+    context = {
+        'foods': sorted_food,
+        'category_name': this_category.name,
+        'restaurant_name': restaurant_name
+    }
+    return render(request, 'res_owner/category.html', context)
+
+
+def cat_others(request, restaurant_id: int):
+    """
+       The page for category Others
+       Show all foods not categorized in the restaurant
+       :param request: a Request object specific to Django
+       :param restaurant_id: the id of the restaurant in the Restaurant table
+   """
+    this_restaurant = Restaurant.objects.get(id=restaurant_id)
+    all_foods = this_restaurant.food_set.all()
+    no_category = []
+    for food in all_foods:
+        # Only add in food items that are not categorized
+        if len(food.category_set.all()) == 0:
+            no_category.append(food)
+    sorted_food = sorted(list(no_category), key=lambda a: a.name)
+    context = {
+        'foods': sorted_food,
+        'category_name': 'Others',
+        'restaurant_name': this_restaurant.name
+    }
+    return render(request, 'res_owner/category.html', context)

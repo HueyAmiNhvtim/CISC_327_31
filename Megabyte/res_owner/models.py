@@ -75,3 +75,9 @@ class Category(models.Model):
     def __str__(self):
         """Return the name of the category"""
         return self.name
+
+    def __eq__(self, other):
+        return other.name == self.name
+
+    def __hash__(self):
+        return hash(self.name)

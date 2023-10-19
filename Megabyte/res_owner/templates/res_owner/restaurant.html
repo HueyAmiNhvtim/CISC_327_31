@@ -7,19 +7,23 @@
 <body>
     {% extends 'res_owner/base.html' %}
     {% block content %}
-        <p>All categories</p>
+        <p>Restaurant: {{ restaurant_name }}: <br> All categories</p>
         <!--Display all restaurants in an unordered list-->
         <ul>
-            <!-- restaurants variable is supposed to be part of the context dictionary! -->
             {% for category in categories %}
                 <li>
-                    <p>{{ category }}</p> <!--Will be a tag once I got the Restaurant page down-->
+                    <a href="{% url 'res_owner:category' category.name restaurant_id %}">
+                        {{ category.name }}
+                    </a>
                 </li>
             {% endfor %}
             <li>
-                <p>Others</p>
+                <a href="{% url 'res_owner:cat_others' restaurant_id %}">
+                    Others
+                </a>
             </li>
         </ul>
     {% endblock content %}
 </body>
+    <!--Will implement the ability to change ca info later-->
 </html>
