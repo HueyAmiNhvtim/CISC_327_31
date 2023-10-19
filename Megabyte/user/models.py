@@ -11,35 +11,32 @@ class UserData(models.Model):
         """Return the username of the user"""
         return self.username
 
-    def change_username(self, new_username):
-        """Change the user's username
-        Params:
-            new_username -> str: the user's new username
-        Returns:
-            True if the operation is successful
+    def change_username(self, new_username: str):
+        """
+        Change the user's username
+        :param new_username: the user's new username
+        :return: True if the operation is successful
         """
         self.user_name = new_username
         return True
 
     def change_email(self, new_email):
-        """Change the user's email
-        Params:
-            new_email -> str: the user's new email
-        Returns:
-            True if the operation is successful
+        """
+        Change the user's email
+        :param new_email: the user's new email
+        :return: True if the operation is successful
         """
         self.email = new_email
         return True
 
     def change_password(self, new_password, verify_password):
-        """Change the user's password
-        Params:
-            new_password -> str: the user's new password
-            verify_password -> str: verification that the user typed 
-                their new password correctly
-        Returns:
-            True if the operation is successful
-            False if the new password and the verification do not match
+        """
+        Change the user's password
+        :param new_password: the user's new password
+        :param verify_password: verification that the user typed their
+            new password correctly
+        :return: True if the operation is successful
+        :return: False if the new password and the verification do not match
         """
         if verify_password == new_password:
             # Passwords match
@@ -63,16 +60,16 @@ class ShoppingCart(models.Model):
         return self.items
 
     def add(self, item: str, restaurant: str, quantity: int, price: float):
-        """Add a food item to cart
+        """
+        Add a food item to cart
         Params:
-            item -> str: name of the item to add
-            restaurant -> str: name of restaurant
-            quantity -> int: number of the item to add
-            price -> float: price of a single unit of the item
-        Returns:
-            True if the operation is successful
-            False if the item already exists in the shopping cart
-                and the quantity is invalid
+        :param item: name of the item to add
+        :param restaurant: name of restaurant
+        :param quantity: number of the item to add
+        :param price: price of a single unit of the item
+        :return: True if the operation is successful
+        :return: False if the item already exists in the shopping cart 
+            and the quantity is invalid
         """
         # Turn items into a list
         items_list = self.items.split(',')
@@ -105,12 +102,11 @@ class ShoppingCart(models.Model):
             return True
 
     def remove(self, item: str):
-        """Remove a food item from cart
-        Params:
-            item -> str: name of the food item to remove from the cart
-        Returns:
-            True if the food has been removed from the cart successfully
-            False if the food did not exist in the cart
+        """
+        Remove a food item from cart
+        :param item: name of the food item to remove from the cart
+        :return: True if the food has been removed from the cart successfully
+        :return: False if the food did not exist in the cart
         """
         # Turn items into a list
         items_list = self.items.split(',')
@@ -137,14 +133,13 @@ class ShoppingCart(models.Model):
             return True
 
     def change_quantity(self, item: str, new_quantity: int):
-        """Change the quantity of an existing item in the cart
-        Params:
-            item -> str: Food name
-            new_quantity -> int: The new quantity of the food in the cart
-        Returns:
-            True if the operation is successful
-            False if the quantity is below 0 or the item does not exist in the
-                cart
+        """
+        Change the quantity of an existing item in the cart
+        :param item: Food name
+        :param new_quantity: The new quantity of the food in the cart
+        :return: True if the operation is successful
+        :return: False if the quantity is below 0 or the item does not 
+            exist in the cart
         """
         if new_quantity < 0:
             # Quantity is below 0, operation failed
