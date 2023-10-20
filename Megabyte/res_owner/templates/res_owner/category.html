@@ -20,6 +20,10 @@
                     <form action="{% url 'res_owner:edit_food' food.id %}" method="get">
                         <button name="edit_food_button">Edit?</button>
                     </form>
+                    <form action="{% url 'res_owner:delete_food' food.id %}" method="post">
+                        {% csrf_token %}
+                        <button name="delete_food_button">Delete?</button>
+                    </form>
                 </li>
             {% endfor %}
         </ul>
