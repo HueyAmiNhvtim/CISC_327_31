@@ -56,6 +56,8 @@ class Food(models.Model):
     name = models.CharField(max_length=200)
 
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
+    price = models.DecimalField(default=0, decimal_places=6, max_digits=12)
+    image_path = models.CharField(default='', max_length=100)
 
     def __str__(self):
         """Return the name of the food"""

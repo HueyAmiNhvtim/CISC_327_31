@@ -22,4 +22,6 @@ urlpatterns = [
     # ORDER MATTERS!! So for miscellaneous items. You have to put the path before the categorized ones
     path('categories/Others/<int:restaurant_id>', views.cat_others, name='cat_others'),
     path('categories/<category_name>/<int:restaurant_id>', views.category, name='category'),
+    # Page for showing each food item in details
+    path('new_food/', views.new_food, name='new_food')
 ]

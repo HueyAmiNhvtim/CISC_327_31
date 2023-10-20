@@ -10,6 +10,7 @@ def res_home_page(request):
     The home page for restaurant owners.
     Show all restaurants the owners own in alphabetical order
     :param request: a Request object specific to Django
+    :return: the rendering of the html page 'res_owner/res_home_page.html'
     """
     restaurants = Restaurant.objects.order_by('name')
     # restaurants = Restaurant.objects.filter(owner=request.user).order_by('name')
@@ -155,3 +156,7 @@ def delete_restaurant(request, restaurant_id: int):
     if request.method == 'POST':
         Restaurant.objects.filter(id=restaurant_id).delete()
     return redirect('res_owner:res_home_page')
+
+
+def new_food(request):
+    pass
