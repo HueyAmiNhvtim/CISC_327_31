@@ -1,0 +1,4 @@
+# Django admin
+
+user: admin
+password: admin123
