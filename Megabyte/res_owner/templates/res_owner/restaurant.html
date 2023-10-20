@@ -28,10 +28,13 @@
         <hr />
         <!-- Trying to do choose a category and then move to the categorizing page here -->
         <form>
-            <label>Category to categorize the foods:</label>
+            <label>Click on a category to categorize:</label>
             <select name="categories_dropdown">
                 {% for category in categories %}
-                    <option onclick="{% url 'res_owner:categorizing' category.name %}"> {{ category.name }} </option>
+                    <option onclick=
+                                    "location.href='{% url 'res_owner:categorizing' category.name %}'">
+                        {{ category.name }}
+                    </option>
                 {% endfor %}
             </select>
         </form>
