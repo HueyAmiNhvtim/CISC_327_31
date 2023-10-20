@@ -36,17 +36,20 @@ class CategoryForm(forms.ModelForm):
 
 
 class CategorizingForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        self.restaurant_id = kwargs.pop('restaurant_id')
+        super(CategorizingForm, self).__init__(*args, **kwargs)
+        this_restaurant = Restaurant.objects.get(id=self.restaurant_id)
+        self.fields['food'].queryset = Food.objects.filter(restaurant=this_restaurant)
+
     class Meta:
         model = Category
         fields = ['name', 'food']
 
-    def __init__(self, *args, **kwargs):
-        self.restaurant_id = kwargs.pop('restaurant_id')
-        super(CategorizingForm, self).__init__(*args, **kwargs)
-        name = forms.CharField()
-        this_restaurant = Restaurant.objects.get(id=self.restaurant_id)
-        food = forms.ModelChoiceField(
-            queryset=Food.objects.filter(restaurant=this_restaurant),
-            widget=forms.CheckboxSelectMultiple
-        )
+    name = forms.CharField()
+    food = forms.ModelMultipleChoiceField(
+        queryset=None,
+        widget=forms.CheckboxSelectMultiple
+    )
+
 
