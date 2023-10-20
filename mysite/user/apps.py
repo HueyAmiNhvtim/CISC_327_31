@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class DbapiConfig(AppConfig):
-    name = 'dbapi'
+class UserConfig(AppConfig):
+    name = 'user'
