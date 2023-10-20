@@ -24,13 +24,6 @@ class FoodForm(forms.ModelForm):
         fields = ['name', 'price', 'image_path']
 
 
-class FoodFormDropDown(forms.ModelForm):
-    # Forms that can have a dropdown list to choose the category, huh....
-    class Meta:
-        model = Food
-        fields = ['name', 'price', 'image_path']
-
-
 class CategorizingForm(forms.ModelForm):
     # Potential Issue:
     # Since categories are shared among the restaurants. Multiple ChoiceField limits the amount of food specific
