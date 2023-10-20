@@ -21,6 +21,13 @@
             {% endfor %}
         </ul>
     {% endblock content %}
+    {% block settings %}
+        <hr />
+        <form action="{% url 'res_owner:new_food' %}" method="get">
+            {% csrf_token %}
+            <button name="new_food_button"> Add Food? </button>
+        </form>
+    {% endblock settings %}
 </body>
     <!-- including settings where you can modify restaurant info and manage order-->
 </html>

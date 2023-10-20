@@ -15,7 +15,12 @@ class RestaurantForm(forms.ModelForm):
 
 
 class FoodForm(forms.ModelForm):
-    nani = 0
+    class Meta:
+        # Tell Django to base this form off the Restaurant model fields
+        model = Food
+        # Fields you wish to be able to edit must match the fields variables in the corresponding
+        # model!
+        fields = ['name', 'price', 'image_path']
 
 
 class CategoryForm(forms.ModelForm):
