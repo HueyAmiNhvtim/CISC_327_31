@@ -7,18 +7,14 @@
 </head>
 <body>
     {% block content %}
-    <form action="{% url 'restaurant' restaurant.id %}" method="post">
-        <label> Please enter your street address:</label>
-        <input type="text" name="street" required>
-        <label> Please enter your city:</label>
-        <input type="text" name="city" required>
-        <label> Please enter your province or state:</label>
-        <input type="text" name="province_or_state" required>
-        <label> Please enter your country:</label>
-        <input type="text" name="country" required>
-        <label> Please enter your postal code:</label>
-        <input type="text" name="street" required>
-        <button type="submit">Submit</button>  
+    <form action="{% url 'user:search_results' %}" method="post">
+        {% csrf_token %}
+        <label> 
+            Please enter your location in the following format:
+            Street address,City,Province,Country,Postal Code
+        </label>
+        <input type="text" name="location" required>
+        <button name="search_button">Search</button>
     </form>
     {% endblock content %}
 </body>

@@ -10,10 +10,10 @@
     <h1>Search Results</h1>
     <ul>
         <!--List of search results-->>
-        {% for result in search_results%}
+        {% for result in results%}
         <li>
-            <a href="{% url 'restaurant' order.id %}">
-              {{ restaurant.name }}  
+            <a href="{% url 'user:restaurant' result.id %}">
+              {{ result.name }}  
             </a>
         </li>
         {% endfor %}

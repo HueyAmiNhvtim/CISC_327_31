@@ -10,6 +10,8 @@ urlpatterns = [
     path('user_settings/', views.user_settings, name='user_settings'),
     # Search page
     path('search', views.search, name='search'),
+    # Search results page
+    path('search_results/', views.search_results, name='search_results'),
     # Restaurant page
     path('restaurant/<int:restaurant_id>', views.restaurant, name='restaurant'),
     # Shopping cart page

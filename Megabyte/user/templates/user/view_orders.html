@@ -12,7 +12,7 @@
         <!--List of orders-->>
         {% for order in orders%}
         <li>
-            <a href="{% url 'order' order.id %}">
+            <a href="{% url 'user:order' order.id %}">
               {{ order.id }}  
             </a>
         </li>

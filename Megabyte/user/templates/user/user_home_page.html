@@ -7,15 +7,15 @@
 </head>
 <body>
     {% block content %}
-    <form action="{% url 'user_settings' %}" method="post">
+    <form action="{% url 'user:user_settings' %}" method="post">
         {% csrf_token %}
         <button name="user_settings_button">User Settings</button>
     </form>>
-    <form action="{% url 'search' %}" method="post">
+    <form action="{% url 'user:search' %}" method="post">
         {% csrf_token %}
         <button name="search_button">Search</button>
     </form>>
-    <form action="{% url 'view_orders' %}" method="post">
+    <form action="{% url 'user:view_orders' %}" method="post">
         {% csrf_token %}
         <button name="view_orders_button">View Orders</button>
     </form>>

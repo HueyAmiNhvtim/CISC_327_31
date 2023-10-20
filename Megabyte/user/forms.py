@@ -9,5 +9,4 @@ class SearchForm(forms.ModelForm):
         model = Location
         # Fields you with to be able to edit must match the fields variables
         # in the corresponding model!
-        fields = ['street', 'city', 'province_or_state',
-                  'country', 'postal_code']
+        fields = ['location']

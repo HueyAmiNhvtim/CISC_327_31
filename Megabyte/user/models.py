@@ -180,15 +180,11 @@ class ShoppingCart(models.Model):
 
 class Location(models.Model):
     """Model representation of the user's location"""
-    street = models.CharField(max_length=254)
-    city = models.CharField(max_length=254)
-    province_or_state = models.CharField(max_length=128)
-    country = models.CharField(max_length=128)
-    postal_code = models.CharField(max_length=10)
+    location = models.CharField(max_length=1024)
 
     def __str__(self):
         """Return the address of the user"""
-        return f"{self.street}, {self.province_or_state}, {self.country}, {self.postal_code}"
+        return self.location
 
 
 class Order(models.Model):

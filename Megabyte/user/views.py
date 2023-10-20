@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import UserData, ShoppingCart, Location, Order
+from res_owner.models import Restaurant, Category
 from .forms import SearchForm
 
 
@@ -25,15 +26,15 @@ def search(request):
     The page to search for restaurants.
     :param request: a Request object specific to Django
     """
-    if request.method != 'GET':
+    if request.method != 'POST':
         # Blank form
         form = SearchForm()
     else:
-        # GET request type confirmed; processing data
-        form = SearchForm(data=request.GET)
+        # POST request type confirmed; processing data
+        form = SearchForm(data=request.POST)
         if form.is_valid():
             form.save()
-            return redirect('restaurants/')
+            return redirect('search_results/')
     return render(request, 'user/search.html')
 
 
@@ -43,7 +44,9 @@ def restaurant(request, restaurant_id: int):
     :param request: a Request object specific to Django
     :param restaurant_id: the id of the restaurant
     """
-    return render(request, 'user/restaurant.html')
+    categories = Category.objects.order_by('name')
+    context = {"categories": categories}
+    return render(request, 'user/restaurant.html', context)
 
 
 def shopping_cart(request, user_id: int):
@@ -73,3 +76,13 @@ def order(request, order_id: int):
     :param order_id: the id of the order
     """
     return render(request, 'user/order.html')
+
+
+def search_results(request):
+    """
+    The page to view the restaurants near the user's location
+    :param request: a Request object specific to Django
+    """
+    results = Restaurant.objects.order_by('location')
+    context = {"results": results}
+    return render(request, 'user/search_results.html', context)
