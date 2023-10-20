@@ -184,8 +184,24 @@ def new_food(request, restaurant_id: int):
 
 def edit_food(request, food_id: int):
     """
-    The page for editing food info as well as categorizing them if need be
+    The page for editing food info
     :param request: a Request object specific to Django
     :param food_id: the id of the food item in the food table
     """
-    pass
+    this_food = Food.objects.get(id=food_id)
+    # Uncomment when user registration is completed
+    # if this_food.restaurant.restaurant_owner != request.user:
+    #     raise Http404
+    if request.method != 'POST':
+        # Initial request: Pre-fill form with the current entry
+        form = FoodForm(instance=this_food)
+    else:
+        # POST request type confirmed, process data
+        form = FoodForm(instance=this_food, data=request.POST)
+        # Might have to change it once custom form validation is implemented.
+        if form.is_valid():
+            form.save()
+            return redirect('res_owner:res_home_page')
+    # This sends the context to render the edit_restaurant.html
+    context = {'form': form, 'food': this_food}
+    return render(request, 'res_owner/edit_food.html', context)

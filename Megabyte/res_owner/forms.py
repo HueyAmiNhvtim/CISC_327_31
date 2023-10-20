@@ -2,6 +2,7 @@ from django import forms
 
 from .models import Restaurant, Food, Category
 
+
 # If custom user.... import customer_user here or sth
 
 
@@ -20,6 +21,13 @@ class FoodForm(forms.ModelForm):
         model = Food
         # Fields you wish to be able to edit must match the fields variables in the corresponding
         # model!
+        fields = ['name', 'price', 'image_path']
+
+
+class FoodFormDropDown(forms.ModelForm):
+    # Forms that can have a dropdown list to choose the category, huh....
+    class Meta:
+        model = Food
         fields = ['name', 'price', 'image_path']
 
 

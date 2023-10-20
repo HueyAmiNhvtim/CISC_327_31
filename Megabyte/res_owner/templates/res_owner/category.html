@@ -17,6 +17,9 @@
                     <p>
                         {{ food }}
                     </p>
+                    <form action="{% url 'res_owner:edit_food' food.id %}" method="get">
+                        <button name="edit_food_button">Edit?</button>
+                    </form>
                 </li>
             {% endfor %}
         </ul>
