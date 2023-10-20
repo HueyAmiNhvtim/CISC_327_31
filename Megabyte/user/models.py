@@ -188,8 +188,7 @@ class Location(models.Model):
 
     def __str__(self):
         """Return the address of the user"""
-        return f"{self.street}, {self.province_or_state}, {self.country},
-        {self.postal_code}"
+        return f"{self.street}, {self.province_or_state}, {self.country}, {self.postal_code}"
 
 
 class Order(models.Model):
