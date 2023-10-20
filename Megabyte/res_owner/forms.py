@@ -35,6 +35,18 @@ class CategoryForm(forms.ModelForm):
     nani = 0
 
 
-# class CategoriesAllDropDown(forms.Form):
-#     categories_selection = forms.ModelChoiceField(
-#         queryset=Category.objects.all().values_list('name'), flat=True)
+class CategorizingForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ['name', 'food']
+
+    def __init__(self, *args, **kwargs):
+        self.restaurant_id = kwargs.pop('restaurant_id')
+        super(CategorizingForm, self).__init__(*args, **kwargs)
+        name = forms.CharField()
+        this_restaurant = Restaurant.objects.get(id=self.restaurant_id)
+        food = forms.ModelChoiceField(
+            queryset=Food.objects.filter(restaurant=this_restaurant),
+            widget=forms.CheckboxSelectMultiple
+        )
+

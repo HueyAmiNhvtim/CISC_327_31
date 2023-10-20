@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import RestaurantOwner, Restaurant, Food, Category
-from .forms import RestaurantForm, FoodForm, CategoryForm
+from .forms import RestaurantForm, FoodForm, CategoryForm, CategorizingForm
 from django.http import Http404
 # Create your views here.
 
@@ -35,8 +35,10 @@ def restaurant(request, restaurant_id: int):
         for food_category in food.category_set.all():
             res_category.add(food_category)
     sorted_category = sorted(list(res_category), key=lambda x: x.name)
+    # Needs refactoring...also in the restaurant.html too
     context = {
         'categories': sorted_category,
+        'restaurant': this_restaurant,
         'restaurant_name': this_restaurant.name,
         'restaurant_id': restaurant_id
     }
@@ -64,9 +66,29 @@ def category(request, category_name: str, restaurant_id: int):
     return render(request, 'res_owner/category.html', context)
 
 
-def categorizing(request, category_name: str):
+def categorizing(request, category_name: str, restaurant_id: int):
+    """
+    The page for categorizing each category to the foods
+    :param request: a Request object specific to Django
+    :param category_name: the name of the category in the Category table
+    :param restaurant_id: the id of the restaurant in the Restaurant table
+    """
+    this_category = Category.objects.get(name=category_name)
 
-    return render(request, 'res_owner/categorizing.html')
+    if request.method != 'POST':
+        # Initial request: Pre-fill form with the current entry
+        form = CategorizingForm(restaurant_id=restaurant_id, instance=this_category)
+    else:
+        # POST request type confirmed, process data
+        form = CategorizingForm(restaurant_id=restaurant_id, instance=this_category)
+        # Might have to change it once custom form validation is implemented.
+        if form.is_valid():
+            form.save_m2m()
+            return redirect('res_owner:res_home_page')
+
+    # This sends the context to render the edit_restaurant.html
+    context = {'form': form, 'category_name': category_name, 'restaurant_id': restaurant_id}
+    return render(request, 'res_owner/categorizing.html', context)
 
 
 def cat_others(request, restaurant_id: int):

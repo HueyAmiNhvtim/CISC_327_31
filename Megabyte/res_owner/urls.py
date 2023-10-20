@@ -23,7 +23,7 @@ urlpatterns = [
     path('categories/Others/<int:restaurant_id>', views.cat_others, name='cat_others'),
     path('categories/<category_name>/<int:restaurant_id>', views.category, name='category'),
     # Page for categorizing food
-    path('categorizing/<category_name>', views.categorizing, name='categorizing'),
+    path('categorizing/<category_name>/<int:restaurant_id>', views.categorizing, name='categorizing'),
     # Page for adding in new food
     path('new_food/<int:restaurant_id>/', views.new_food, name='new_food'),
     # Page for editing food entries and categorizing them

@@ -5,6 +5,16 @@
     <title>Title</title>
 </head>
 <body>
-
+    {% extends 'res_owner/base.html' %}
+    {% block content %}
+        <p>Categorizing using {{ category_name }}:</p>
+        <form
+                action="{% url 'res_owner:categorizing' category_name restaurant_id %}"
+                method="post">
+            {% csrf_token %}
+            {{ form.as_div }}
+            <button name="submit_categorizing">Apply</button>
+        </form>
+    {% endblock content%}
 </body>
 </html>

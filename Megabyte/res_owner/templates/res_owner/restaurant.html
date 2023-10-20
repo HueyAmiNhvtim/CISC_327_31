@@ -32,7 +32,7 @@
             <select name="categories_dropdown">
                 {% for category in categories %}
                     <option onclick=
-                                    "location.href='{% url 'res_owner:categorizing' category.name %}'">
+                                    "location.href='{% url 'res_owner:categorizing' category.name restaurant.id %}'">
                         {{ category.name }}
                     </option>
                 {% endfor %}
