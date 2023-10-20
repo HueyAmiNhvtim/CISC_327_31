@@ -54,9 +54,14 @@ def category(request, category_name: str, restaurant_id: int):
     :param restaurant_id: the id of the restaurant in the Restaurant table
     """
     this_category = Category.objects.get(name=category_name)
-    foods = this_category.food.all()
+    this_restaurant = Restaurant.objects.get(id=restaurant_id)
+    all_foods = this_category.food.all()
+    foods = []
+    for food in all_foods:
+        if food.restaurant.name == this_restaurant.name:
+            foods.append(food)
     restaurant_name = foods[0].restaurant.name
-    sorted_food = sorted(list(foods), key=lambda a: a.name)
+    sorted_food = sorted(foods, key=lambda a: a.name)
     context = {
         'foods': sorted_food,
         'category_name': this_category.name,
@@ -83,6 +88,12 @@ def categorizing(request, category_name: str, restaurant_id: int):
         form = CategorizingForm(data=request.POST, restaurant_id=restaurant_id, instance=this_category)
         if form.is_valid():
             form.save()
+            if len(form.food_not_in_res) > 0:
+                existing_cat_name = form.data['name']
+                this_category = Category.objects.get(name=existing_cat_name)
+                for food in form.food_not_in_res:
+                    this_category.food.add(food)
+                this_category.save()
             return redirect('res_owner:res_home_page')
 
     # This sends the context to render the edit_restaurant.html
@@ -96,7 +107,6 @@ def new_category(request, restaurant_id: int):
     :param request: a Request object specific to Django
     :param restaurant_id: the id of the restaurant in the Restaurant table
     """
-
     if request.method != 'POST':
         # Empty Form
         form = NewCategoryForm(restaurant_id=restaurant_id)
@@ -112,17 +122,49 @@ def new_category(request, restaurant_id: int):
                 this_category = Category.objects.get(name=existing_cat_name)
                 form = NewCategoryForm(
                     data=request.POST,
-                    restaurant_id=4,
+                    restaurant_id=restaurant_id,
                     instance=this_category
                 )
 
         if form.is_valid():
             form.save()
+            if len(form.food_not_in_res) > 0:
+                existing_cat_name = form.data['name']
+                this_category = Category.objects.get(name=existing_cat_name)
+                for food in form.food_not_in_res:
+                    this_category.food.add(food)
+                this_category.save()
             return redirect('res_owner:res_home_page')
 
     # This sends the context to render the edit_restaurant.html
     context = {'form': form, 'restaurant_id': restaurant_id}
     return render(request, 'res_owner/new_category.html', context)
+
+
+def delete_category(request, category_name: str, restaurant_id: int):
+    """
+    The page for allowing the deletion of the category.
+    If the category still has data assigned to it, then simply remove the category off
+    every food in this restaurant. If not, then just delete it off the database.
+    :param request: a Request object specific to Django
+    :param restaurant_id: the id of the restaurant in the Restaurant table
+    :param category_name: the name of the category in the Category table
+    """
+    if request.method == 'POST':
+        this_restaurant = Restaurant.objects.get(id=restaurant_id)
+        this_category = Category.objects.get(name=category_name)
+        foods = this_restaurant.food_set.all()
+        # Count the number of foods in this restaurant with this category
+        foods_with_same_cat = 0
+        for food in foods:
+            for food_category in food.category_set.all():
+                if food_category.name == category_name:
+                    foods_with_same_cat += 1
+        if foods_with_same_cat == this_category.food.count():
+            print("aya")
+        print(foods_with_same_cat)
+        print(this_category.food.count())
+    return redirect('res_owner:res_home_page')
 
 
 def cat_others(request, restaurant_id: int):

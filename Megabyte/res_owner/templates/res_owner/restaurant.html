@@ -15,6 +15,10 @@
                     <a href="{% url 'res_owner:category' category.name restaurant_id %}">
                         {{ category.name }}
                     </a>
+                    <form action="{% url 'res_owner:delete_category' category.name restaurant_id %}" method="post">
+                        {% csrf_token %}
+                        <button name="delete_cat_button">Delete?</button>
+                    </form>
                 </li>
             {% endfor %}
             <li>
