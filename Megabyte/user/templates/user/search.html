@@ -7,6 +7,19 @@
 </head>
 <body>
     {% block content %}
+    <form action="{% url 'restaurant' restaurant.id %}" method="post">
+        <label> Please enter your street address:</label>
+        <input type="text" name="street" required>
+        <label> Please enter your city:</label>
+        <input type="text" name="city" required>
+        <label> Please enter your province or state:</label>
+        <input type="text" name="province_or_state" required>
+        <label> Please enter your country:</label>
+        <input type="text" name="country" required>
+        <label> Please enter your postal code:</label>
+        <input type="text" name="street" required>
+        <button type="submit">Submit</button>  
+    </form>
     {% endblock content %}
 </body>
 </html>

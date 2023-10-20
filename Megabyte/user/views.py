@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import UserData, ShoppingCart, Location
+from .models import UserData, ShoppingCart, Location, Order
 from .forms import SearchForm
 
 
@@ -9,6 +9,7 @@ def user_home_page(request):
     The home page for users.
     :param request: a Request object specific to Django
     """
+    return render(request, "user/user_home_page.html")
 
 
 def user_settings(request):
@@ -16,7 +17,7 @@ def user_settings(request):
     The page to manage user settings
     :param request: a Request object specific to Django
     """
-    return HttpResponse("Settings")
+    return render(request, "user/user_settings.html")
 
 
 def search(request):
@@ -28,11 +29,12 @@ def search(request):
         # Blank form
         form = SearchForm()
     else:
-        # POST request type confirmed; processing data
+        # GET request type confirmed; processing data
         form = SearchForm(data=request.GET)
         if form.is_valid():
+            form.save()
             return redirect('restaurants/')
-    return HttpResponse("Search")
+    return render(request, 'user/search.html')
 
 
 def restaurant(request, restaurant_id: int):
@@ -41,6 +43,7 @@ def restaurant(request, restaurant_id: int):
     :param request: a Request object specific to Django
     :param restaurant_id: the id of the restaurant
     """
+    return render(request, 'user/restaurant.html')
 
 
 def shopping_cart(request, user_id: int):
@@ -49,16 +52,18 @@ def shopping_cart(request, user_id: int):
     :param request: a Request object specific to Django
     :param user_id: the id of the user
     """
+    return render(request, 'user/shopping_cart.html')
 
 
-def view_orders(request, user_id: int):
+def view_orders(request):
     """
     The page to view the user's orders
     :param request: a Request object specific to Django
     :param user_id: the id of the user
     """
-
-    return HttpResponse("Order")
+    orders = Order.objects.order_by('date_and_time')
+    context = {"orders": orders}
+    return render(request, 'user/view_orders.html', context)
 
 
 def order(request, order_id: int):
@@ -67,3 +72,4 @@ def order(request, order_id: int):
     :param request: a Request object specific to Django
     :param order_id: the id of the order
     """
+    return render(request, 'user/order.html')

@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Orders</title>
+    <title>Search Results</title>
 </head>
 <body>
     {% block content %}
-    <h1>Orders</h1>
+    <h1>Search Results</h1>
     <ul>
-        <!--List of orders-->>
-        {% for order in orders%}
+        <!--List of search results-->>
+        {% for result in search_results%}
         <li>
-            <a href="{% url 'order' order.id %}">
-              {{ order.id }}  
+            <a href="{% url 'restaurant' order.id %}">
+              {{ restaurant.name }}  
             </a>
         </li>
         {% endfor %}

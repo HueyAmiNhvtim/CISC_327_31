@@ -194,6 +194,7 @@ class Location(models.Model):
 class Order(models.Model):
     """Model representation of an order"""
     order_id = models.PositiveIntegerField()
+    date_and_time = models.DateTimeField()
     items = models.CharField(max_length=50000)
     restaurants = models.CharField(max_length=50000)
     quantities = models.CharField(max_length=50000)
@@ -201,4 +202,4 @@ class Order(models.Model):
 
     def __str__(self):
         """Return the order id"""
-        return self.order_id
+        return str(self.order_id)
