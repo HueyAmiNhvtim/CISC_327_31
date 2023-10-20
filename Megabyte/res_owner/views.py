@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import RestaurantOwner, Restaurant, Food, Category
-from .forms import RestaurantForm, FoodForm, CategorizingForm
+from .forms import RestaurantForm, FoodForm, CategorizingForm, NewCategoryForm
 from django.http import Http404
 # Create your views here.
 
@@ -99,10 +99,23 @@ def new_category(request, restaurant_id: int):
 
     if request.method != 'POST':
         # Empty Form
-        form = CategorizingForm(restaurant_id=restaurant_id)
+        form = NewCategoryForm(restaurant_id=restaurant_id)
     else:
         # POST request type confirmed, process data
-        form = CategorizingForm(data=request.POST, restaurant_id=restaurant_id)
+        form = NewCategoryForm(data=request.POST, restaurant_id=restaurant_id)
+
+        # Check if there is an error associated with field name in the form.
+        if form.errors.get('name') is not None:
+            # When the duplicate key in Category table exists.
+            if form.errors['name'].as_data():
+                existing_cat_name = form.data['name']
+                this_category = Category.objects.get(name=existing_cat_name)
+                form = NewCategoryForm(
+                    data=request.POST,
+                    restaurant_id=4,
+                    instance=this_category
+                )
+
         if form.is_valid():
             form.save()
             return redirect('res_owner:res_home_page')

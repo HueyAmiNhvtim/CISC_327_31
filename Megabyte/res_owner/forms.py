@@ -49,3 +49,22 @@ class CategorizingForm(forms.ModelForm):
     )
 
 
+class NewCategoryForm(forms.ModelForm):
+    # Now, how do you deal with an existing Category from another restaurants....?
+    def __init__(self, *args, **kwargs):
+        self.restaurant_id = kwargs.pop('restaurant_id')
+        super(NewCategoryForm, self).__init__(*args, **kwargs)
+        this_restaurant = Restaurant.objects.get(id=self.restaurant_id)
+        self.fields['food'].queryset = Food.objects.filter(restaurant=this_restaurant)
+
+    class Meta:
+        model = Category
+        fields = ['name', 'food']
+
+    name = forms.CharField()
+    food = forms.ModelMultipleChoiceField(
+        queryset=None,
+        widget=forms.CheckboxSelectMultiple,
+    )
+
+
