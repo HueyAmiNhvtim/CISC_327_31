@@ -104,7 +104,7 @@ def new_category(request, restaurant_id: int):
         # POST request type confirmed, process data
         form = NewCategoryForm(data=request.POST, restaurant_id=restaurant_id)
 
-        # Check if there is an error associated with field name in the form.
+        # Check if there is an error associated with field name in the form. Cursed, I know.
         if form.errors.get('name') is not None:
             # When the duplicate key in Category table exists.
             if form.errors['name'].as_data():
