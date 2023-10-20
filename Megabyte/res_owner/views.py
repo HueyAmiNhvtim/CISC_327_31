@@ -159,11 +159,11 @@ def delete_category(request, category_name: str, restaurant_id: int):
         for food in foods:
             for food_category in food.category_set.all():
                 if food_category.name == category_name:
+                    this_category.food.remove(food)
                     foods_with_same_cat += 1
+        # Basically, this means this category is used only by this restaurant. So delete it off the database also
         if foods_with_same_cat == this_category.food.count():
-            print("aya")
-        print(foods_with_same_cat)
-        print(this_category.food.count())
+            Category.objects.filter(name=category_name).delete()
     return redirect('res_owner:res_home_page')
 
 
