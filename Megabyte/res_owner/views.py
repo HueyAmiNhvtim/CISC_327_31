@@ -80,10 +80,9 @@ def categorizing(request, category_name: str, restaurant_id: int):
         form = CategorizingForm(restaurant_id=restaurant_id, instance=this_category)
     else:
         # POST request type confirmed, process data
-        form = CategorizingForm(restaurant_id=restaurant_id, instance=this_category)
-        # Might have to change it once custom form validation is implemented.
+        form = CategorizingForm(data=request.POST, restaurant_id=restaurant_id, instance=this_category)
         if form.is_valid():
-            form.save_m2m()
+            form.save()
             return redirect('res_owner:res_home_page')
 
     # This sends the context to render the edit_restaurant.html
