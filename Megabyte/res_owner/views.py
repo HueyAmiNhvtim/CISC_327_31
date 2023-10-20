@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import RestaurantOwner, Restaurant, Food, Category
-from .forms import RestaurantForm, FoodForm, CategoryForm, CategorizingForm
+from .forms import RestaurantForm, FoodForm, CategorizingForm
 from django.http import Http404
 # Create your views here.
 
@@ -88,6 +88,28 @@ def categorizing(request, category_name: str, restaurant_id: int):
     # This sends the context to render the edit_restaurant.html
     context = {'form': form, 'category_name': category_name, 'restaurant_id': restaurant_id}
     return render(request, 'res_owner/categorizing.html', context)
+
+
+def new_category(request, restaurant_id: int):
+    """
+    The page for adding new categories + allowing for categorization
+    :param request: a Request object specific to Django
+    :param restaurant_id: the id of the restaurant in the Restaurant table
+    """
+
+    if request.method != 'POST':
+        # Empty Form
+        form = CategorizingForm(restaurant_id=restaurant_id)
+    else:
+        # POST request type confirmed, process data
+        form = CategorizingForm(data=request.POST, restaurant_id=restaurant_id)
+        if form.is_valid():
+            form.save()
+            return redirect('res_owner:res_home_page')
+
+    # This sends the context to render the edit_restaurant.html
+    context = {'form': form, 'restaurant_id': restaurant_id}
+    return render(request, 'res_owner/new_category.html', context)
 
 
 def cat_others(request, restaurant_id: int):

@@ -38,7 +38,12 @@
                 {% endfor %}
             </select>
         </form>
+        <form action="{% url 'res_owner:new_category' restaurant.id %}" method="get">
+            <label>Or add a new category here:</label>
+            <button>
+                Add a category?
+            </button>
+        </form>
     {% endblock settings%}
 </body>
-    <!--Will implement the ability to change ca info later-->
 </html>

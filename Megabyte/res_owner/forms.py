@@ -31,10 +31,6 @@ class FoodFormDropDown(forms.ModelForm):
         fields = ['name', 'price', 'image_path']
 
 
-class CategoryForm(forms.ModelForm):
-    nani = 0
-
-
 class CategorizingForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.restaurant_id = kwargs.pop('restaurant_id')
@@ -49,7 +45,7 @@ class CategorizingForm(forms.ModelForm):
     name = forms.CharField()
     food = forms.ModelMultipleChoiceField(
         queryset=None,
-        widget=forms.CheckboxSelectMultiple
+        widget=forms.CheckboxSelectMultiple,
     )
 
 
