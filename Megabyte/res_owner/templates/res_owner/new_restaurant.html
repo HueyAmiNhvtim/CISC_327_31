@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    {% extends 'res_owner/base.html' %}
+    {% block content %}
+        <form action="{% url 'res_owner:new_restaurant' %}" method="post">
+            {% csrf_token %}
+            {{ form.as_div }}
+            <button name="submit_new_res">Add a new restaurant</button>
+        </form>
+    {% endblock content%}
+</body>
+</html>
