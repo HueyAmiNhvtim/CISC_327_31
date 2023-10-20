@@ -164,7 +164,7 @@ def new_food(request, restaurant_id: int):
     """
     The page for adding in a new food without categories.
     :param request: a Request object specific to Django
-    :param restaurant_id: the id of the restaurant in the Restaurant table to delete
+    :param restaurant_id: the id of the restaurant in the Restaurant table
     """
     if request.method != 'POST':
         # Blank form
@@ -181,3 +181,11 @@ def new_food(request, restaurant_id: int):
     context = {'form': form, 'restaurant_id': restaurant_id}
     return render(request, 'res_owner/new_food.html', context)
 
+
+def edit_food(request, food_id: int):
+    """
+    The page for editing food info as well as categorizing them if need be
+    :param request: a Request object specific to Django
+    :param food_id: the id of the food item in the food table
+    """
+    pass
