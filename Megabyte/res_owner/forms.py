@@ -41,7 +41,6 @@ class CategorizingForm(forms.ModelForm):
         super(CategorizingForm, self).__init__(*args, **kwargs)
         self.this_restaurant = Restaurant.objects.get(id=self.restaurant_id)
         self.fields['food'].queryset = Food.objects.filter(restaurant=self.this_restaurant)
-
         self.food_not_in_res = []
         # For getting food not in this restaurant but is associated with the category
         if kwargs.get("instance"):
@@ -53,8 +52,7 @@ class CategorizingForm(forms.ModelForm):
     class Meta:
         model = Category
         fields = ['name', 'food']
-
-    name = forms.CharField()
+    name = forms.CharField(disabled=True)
     food = forms.ModelMultipleChoiceField(
         queryset=None,
         widget=forms.CheckboxSelectMultiple,
