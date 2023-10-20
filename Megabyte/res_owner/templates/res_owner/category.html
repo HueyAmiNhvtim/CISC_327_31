@@ -22,8 +22,9 @@
         </ul>
     {% endblock content %}
     {% block settings %}
+        <!--Add new food-->
         <hr />
-        <form action="{% url 'res_owner:new_food' %}" method="get">
+        <form action="{% url 'res_owner:new_food' restaurant_id %}" method="get">
             {% csrf_token %}
             <button name="new_food_button"> Add Food? </button>
         </form>

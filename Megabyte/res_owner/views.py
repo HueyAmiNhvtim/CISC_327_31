@@ -58,7 +58,8 @@ def category(request, category_name: str, restaurant_id: int):
     context = {
         'foods': sorted_food,
         'category_name': this_category.name,
-        'restaurant_name': restaurant_name
+        'restaurant_name': restaurant_name,
+        'restaurant_id': restaurant_id
     }
     return render(request, 'res_owner/category.html', context)
 
@@ -81,7 +82,8 @@ def cat_others(request, restaurant_id: int):
     context = {
         'foods': sorted_food,
         'category_name': 'Others',
-        'restaurant_name': this_restaurant.name
+        'restaurant_name': this_restaurant.name,
+        'restaurant_id': restaurant_id
     }
     return render(request, 'res_owner/category.html', context)
 
@@ -158,5 +160,24 @@ def delete_restaurant(request, restaurant_id: int):
     return redirect('res_owner:res_home_page')
 
 
-def new_food(request):
-    pass
+def new_food(request, restaurant_id: int):
+    """
+    The page for adding in a new food without categories.
+    :param request: a Request object specific to Django
+    :param restaurant_id: the id of the restaurant in the Restaurant table to delete
+    """
+    if request.method != 'POST':
+        # Blank form
+        form = FoodForm()
+    else:
+        this_restaurant = Restaurant.objects.get(id=restaurant_id)
+        # POST request type confirmed; processing data
+        form = FoodForm(data=request.POST)
+        if form.is_valid():
+            new_food = form.save(commit=False)
+            new_food.restaurant = this_restaurant
+            new_food.save()  # Save to the database
+            return redirect('res_owner:res_home_page')
+    context = {'form': form, 'restaurant_id': restaurant_id}
+    return render(request, 'res_owner/new_food.html', context)
+
