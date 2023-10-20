@@ -24,6 +24,18 @@
             </li>
         </ul>
     {% endblock content %}
+    {% block settings %}
+        <hr />
+        <!-- Trying to do choose a category and then move to the categorizing page here -->
+        <form>
+            <label>Category to categorize the foods:</label>
+            <select name="categories_dropdown">
+                {% for category in categories %}
+                    <option onclick="{% url 'res_owner:categorizing' category.name %}"> {{ category.name }} </option>
+                {% endfor %}
+            </select>
+        </form>
+    {% endblock settings%}
 </body>
     <!--Will implement the ability to change ca info later-->
 </html>

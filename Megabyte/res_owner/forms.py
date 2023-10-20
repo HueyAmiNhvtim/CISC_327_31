@@ -33,3 +33,8 @@ class FoodFormDropDown(forms.ModelForm):
 
 class CategoryForm(forms.ModelForm):
     nani = 0
+
+
+# class CategoriesAllDropDown(forms.Form):
+#     categories_selection = forms.ModelChoiceField(
+#         queryset=Category.objects.all().values_list('name'), flat=True)

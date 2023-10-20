@@ -64,6 +64,11 @@ def category(request, category_name: str, restaurant_id: int):
     return render(request, 'res_owner/category.html', context)
 
 
+def categorizing(request, category_name: str):
+
+    return render(request, 'res_owner/categorizing.html')
+
+
 def cat_others(request, restaurant_id: int):
     """
        The page for category Others
