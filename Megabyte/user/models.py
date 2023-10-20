@@ -72,11 +72,11 @@ class ShoppingCart(models.Model):
             and the quantity is invalid
         """
         # Turn items into a list
-        items_list = self.items.split(',')
+        items_list = self.process(self.items)
         if item in items_list:
             # Item already exists in cart, add to quantity instead
             # Turn quantities into a list
-            quantities_list = self.quantities.split(',')
+            quantities_list = self.process(self.quantities)
             # Find index of the item
             item_index = items_list.index(item)
             # Find old quantity of the item
@@ -109,15 +109,15 @@ class ShoppingCart(models.Model):
         :return: False if the food did not exist in the cart
         """
         # Turn items into a list
-        items_list = self.items.split(',')
+        items_list = self.process(self.items)
         if item not in items_list:
             # Item to remove is not in list, operation failed
             return False
         else:
             # Turn other fields into lists
-            restaurants_list = self.restaurants.split(',')
-            quantities_list = self.quantities.split(',')
-            prices_list = self.prices.split(',')
+            restaurants_list = self.process(self.restaurants)
+            quantities_list = self.process(self.quantities)
+            prices_list = self.process(self.prices)
             # Find index of item to remove
             item_index = items_list.index(item)
             # Remove food
@@ -125,10 +125,10 @@ class ShoppingCart(models.Model):
             restaurants_list.pop(item_index)
             quantities_list.pop(item_index)
             prices_list.pop(item_index)
-            self.items = ','.join(items_list)
-            self.restaurants = ','.join(restaurants_list)
-            self.quantities = ','.join(quantities_list)
-            self.prices = ','.join(prices_list)
+            self.items = self.convert(items_list)
+            self.restaurants = self.convert(restaurants_list)
+            self.quantities = self.convert(quantities_list)
+            self.prices = self.convert(prices_list)
             # Operation successful
             return True
 
@@ -146,20 +146,36 @@ class ShoppingCart(models.Model):
             return False
         else:
             # Turn items into a list
-            items_list = self.items.split(',')
+            items_list = self.process(self.items)
             if item not in items_list:
                 # Item does not exist in shopping cart, operation failed
                 return False
             else:
                 # Turn quantities into a list
-                quantities_list = self.quantities.split(',')
+                quantities_list = self.process(self.quantities)
                 # Find index of the item
                 item_index = items_list.index(item)
                 # Change quantity of the item to the new quantity
                 quantities_list[item_index] = str(new_quantity)
-                self.quantities = ','.join(quantities_list)
+                self.quantities = self.convert(quantities_list)
                 # Operation successful
                 return True
+
+    def process(self, string_list):
+        """
+        Process a list in string form into a list
+        :param string_list: a string to process
+        :return: a list of strings
+        """
+        return string_list.split(',')
+
+    def convert(self, list_of_strings):
+        """
+        Convert a list of strings to string form
+        :param list_of_strings: a list of strings
+        :return: the list in string form
+        """
+        return ','.join(list_of_strings)
 
 
 class Location(models.Model):
@@ -174,3 +190,16 @@ class Location(models.Model):
         """Return the address of the user"""
         return f"{self.street}, {self.province_or_state}, {self.country},
         {self.postal_code}"
+
+
+class Order(models.Model):
+    """Model representation of an order"""
+    order_id = models.PositiveIntegerField()
+    items = models.CharField(max_length=50000)
+    restaurants = models.CharField(max_length=50000)
+    quantities = models.CharField(max_length=50000)
+    prices = models.CharField(max_length=50000)
+
+    def __str__(self):
+        """Return the order id"""
+        return self.order_id

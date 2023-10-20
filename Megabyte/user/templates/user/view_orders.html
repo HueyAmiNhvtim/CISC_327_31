@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Orders</title>
+</head>
+<body>
+    {% block content %}
+    <h1>Orders</h1>
+    <ul>
+        <!--List of orders, orders might not be defined yet-->>
+        {% for order in orders%}
+        <li>
+            <a href="{% url 'user:order' order.id %}">
+              {{ order.id }}  
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endblock content %}
+</body>
+</html>

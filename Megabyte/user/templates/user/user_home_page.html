@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+</head>
+<body>
+    {% block content %}
+    {% csrf_token %}
+    <form action="{% url 'user:user_settings' %}" method="get">
+        <button name="user_settings_button">User Settings</button>
+    </form>>
+    <form action="{% url 'user:search' %}" method="get">
+        <button name="search_button">Search</button>
+    </form>>
+    <form action="{% url 'user:view_orders' %}" method="get">
+        <button name="view_orders_button">Search</button>
+    </form>>
+    {% endblock content %}
+</body>
+</html>
