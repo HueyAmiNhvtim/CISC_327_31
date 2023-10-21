@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    {% extends 'res_owner/base.html' %}
+    {% block content %}
+        <p>Restaurant: {{ restaurant_name }}: <br> All categories</p>
+        <!--Display all restaurants in an unordered list-->
+        <ul>
+            {% for category in categories %}
+                <li>
+                    <a href="{% url 'res_owner:category' category.name restaurant_id %}">
+                        {{ category.name }}
+                    </a>
+                </li>
+            {% endfor %}
+            <li>
+                <a href="{% url 'res_owner:cat_others' restaurant_id %}">
+                    Others
+                </a>
+            </li>
+        </ul>
+    {% endblock content %}
+    {% block settings %}
+        <hr />
+        <!-- Trying to do choose a category and then move to the categorizing page here -->
+        <form>
+            <label>Click on a category to categorize:</label>
+            <select name="categories_dropdown">
+                {% for category in categories %}
+                    <option onclick=
+                                    "location.href='{% url 'res_owner:categorizing' category.name restaurant.id %}'">
+                        {{ category.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+        <form action="{% url 'res_owner:new_category' restaurant.id %}" method="get">
+            <label>Or add a new category here:</label>
+            <button>
+                Add a category?
+            </button>
+        </form>
+    {% endblock settings%}
+</body>
+</html>

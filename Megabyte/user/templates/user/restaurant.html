@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant</title>
+</head>
+<body>
+    {% extends 'user/base.html' %}
+    {% block content %}
+    <h1>Restaurant</h1>
+        <ul>
+            <!--List of categories-->
+            {% for category in categories%}
+            <li>
+                <a href="{% url 'user:category' category.name %}">
+                {{ category.name }}  
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    {% endblock content %}
+</body>
+</html>

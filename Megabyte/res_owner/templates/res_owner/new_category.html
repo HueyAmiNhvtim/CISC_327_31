@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    {% extends 'res_owner/base.html' %}
+    {% block content %}
+        <p>Add the new category here:</p>
+        <form
+                action="{% url 'res_owner:new_category' restaurant_id %}"
+                method="post">
+            {% csrf_token %}
+            {{ form.as_div }}
+            <button name="submit_categorizing">Apply</button>
+        </form>
+    {% endblock content%}
+</body>
+</html>

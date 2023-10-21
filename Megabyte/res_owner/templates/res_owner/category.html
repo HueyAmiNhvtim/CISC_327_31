@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    {% extends 'res_owner/base.html' %}
+    {% block content %}
+        <p>Restaurant: {{ restaurant_name }} <br>
+            All foods associating with category {{ category_name }} </p>
+        <!--Display all restaurants in an unordered list-->
+        <ul>
+            <!-- restaurants variable is supposed to be part of the context dictionary! -->
+            {% for food in foods %}
+                <li>
+                    <p>
+                        {{ food }}
+                    </p>
+                    <form action="{% url 'res_owner:edit_food' food.id %}" method="get">
+                        <button name="edit_food_button">Edit?</button>
+                    </form>
+                    <form action="{% url 'res_owner:delete_food' food.id %}" method="post">
+                        {% csrf_token %}
+                        <button name="delete_food_button">Delete?</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endblock content %}
+    {% block settings %}
+        <!--Add new food-->
+        <hr />
+        <form action="{% url 'res_owner:new_food' restaurant_id %}" method="get">
+            {% csrf_token %}
+            <button name="new_food_button"> Add Food? </button>
+        </form>
+    {% endblock settings %}
+</body>
+    <!-- including settings where you can modify restaurant info and manage order-->
+</html>

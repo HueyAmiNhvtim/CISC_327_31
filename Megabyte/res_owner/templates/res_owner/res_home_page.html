@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    {% extends 'res_owner/base.html' %}
+    {% block content %}
+        <p>All restaurants</p>
+        <!--Display all restaurants in an unordered list-->
+        <ul>
+            <!-- restaurants variable is supposed to be part of the context dictionary! -->
+            {% for restaurant in restaurants %}
+                <li>
+                    <a href="{% url 'res_owner:restaurant' restaurant.id %}">
+                        {{ restaurant.name }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endblock content %}
+    <!--Has to be within a block-->
+    {% block settings %}
+        <hr />
+        <form action="{% url 'res_owner:res_settings' %}" method="get">
+            {% csrf_token %}
+            <button name="res_settings_button">Restaurant Settings</button>
+        </form>
+    {% endblock settings %}
+</body>
+    <!-- including settings where you can change, modify owner's info, and modify restaurant's info-->
+</html>
