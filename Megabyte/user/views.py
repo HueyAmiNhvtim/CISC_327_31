@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import UserData, ShoppingCart, Location, Order
-from ..res_owner.models import Restaurant, Category, Food
+from res_owner.models import Restaurant, Category, Food
 from .forms import SearchForm, AddToCartForm
 
 

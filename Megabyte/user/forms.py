@@ -1,7 +1,7 @@
 from django import forms
 
 from .models import Location, UserData, Quantity
-from ..res_owner.models import Food
+from res_owner.models import Food
 
 
 class SearchForm(forms.ModelForm):
