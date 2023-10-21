@@ -17,7 +17,9 @@ urlpatterns = [
 
     # Page for each restaurant
     path('restaurants/<int:restaurant_id>/', views.restaurant, name='restaurant'),
-    # Page for each category, the url patterns captures the arguments for the respective
+    # Page for deleting the category, well, not completely deleting off the database of course.
+    path('delete_category/<category_name>/<int:restaurant_id>/', views.delete_category, name='delete_category'),
+    # Pages for each category, the url patterns captures the arguments for the respective
     # views functions
     # ORDER MATTERS!! So for miscellaneous items. You have to put the path before the categorized ones
     path('categories/Others/<int:restaurant_id>', views.cat_others, name='cat_others'),

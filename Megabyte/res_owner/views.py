@@ -8,9 +8,9 @@ from django.http import Http404
 def res_home_page(request):
     """
     The home page for restaurant owners.
-    Show all restaurants the owners own in alphabetical order
-    :param request: a Request object specific to Django
-    :return: the rendering of the html page 'res_owner/res_home_page.html'
+    Show all restaurants the owners own in alphabetical order.
+    :param request: a HttpRequest object specific to Django
+    :return the rendering of the html page 'res_owner/res_home_page.html'
     """
     restaurants = Restaurant.objects.order_by('name')
     # restaurants = Restaurant.objects.filter(owner=request.user).order_by('name')
@@ -23,8 +23,9 @@ def restaurant(request, restaurant_id: int):
     """
     The page for each restaurant.
     Show all the categories of a restaurant
-    :param request: a Request object specific to Django
+    :param request: a HttpRequest object specific to Django
     :param restaurant_id: the id of the restaurant in the Restaurant table
+    :return the rendering of the html page 'res_owner/restaurant.html'
     """
     this_restaurant = Restaurant.objects.get(id=restaurant_id)
     foods = this_restaurant.food_set.all()
@@ -48,15 +49,21 @@ def restaurant(request, restaurant_id: int):
 def category(request, category_name: str, restaurant_id: int):
     """
     The page for each category.
-    Show all foods associated with that category in the restaurant
-    :param request: a Request object specific to Django
+    Show all foods associated with that category in the restaurant.
+    :param request: a HttpRequest object specific to Django
     :param category_name: the name of the category in the Category table
     :param restaurant_id: the id of the restaurant in the Restaurant table
+    :return the rendering of the html page 'res_owner/category.html'
     """
     this_category = Category.objects.get(name=category_name)
-    foods = this_category.food.all()
+    this_restaurant = Restaurant.objects.get(id=restaurant_id)
+    all_foods = this_category.food.all()
+    foods = []
+    for food in all_foods:
+        if food.restaurant.name == this_restaurant.name:
+            foods.append(food)
     restaurant_name = foods[0].restaurant.name
-    sorted_food = sorted(list(foods), key=lambda a: a.name)
+    sorted_food = sorted(foods, key=lambda a: a.name)
     context = {
         'foods': sorted_food,
         'category_name': this_category.name,
@@ -68,10 +75,12 @@ def category(request, category_name: str, restaurant_id: int):
 
 def categorizing(request, category_name: str, restaurant_id: int):
     """
-    The page for categorizing each category to the foods
-    :param request: a Request object specific to Django
+    The page for assigning a category to the foods
+    :param request: a HttpRequest object specific to Django
     :param category_name: the name of the category in the Category table
     :param restaurant_id: the id of the restaurant in the Restaurant table
+    :return the rendering of the html page 'res_owner/categorizing.html' upon a GET request
+            or a redirect to the home page upon a successful POST request
     """
     this_category = Category.objects.get(name=category_name)
 
@@ -83,6 +92,12 @@ def categorizing(request, category_name: str, restaurant_id: int):
         form = CategorizingForm(data=request.POST, restaurant_id=restaurant_id, instance=this_category)
         if form.is_valid():
             form.save()
+            if len(form.food_not_in_res) > 0:
+                existing_cat_name = form.data['name']
+                this_category = Category.objects.get(name=existing_cat_name)
+                for food in form.food_not_in_res:
+                    this_category.food.add(food)
+                this_category.save()
             return redirect('res_owner:res_home_page')
 
     # This sends the context to render the edit_restaurant.html
@@ -92,11 +107,12 @@ def categorizing(request, category_name: str, restaurant_id: int):
 
 def new_category(request, restaurant_id: int):
     """
-    The page for adding new categories + allowing for categorization
-    :param request: a Request object specific to Django
+    The page for adding new categories + categorization of food items.
+    :param request: a HttpRequest object specific to Django
     :param restaurant_id: the id of the restaurant in the Restaurant table
+    :return the rendering of the html page 'res_owner/new_category.html' upon a GET request
+            or a redirect to the home page upon a successful POST request
     """
-
     if request.method != 'POST':
         # Empty Form
         form = NewCategoryForm(restaurant_id=restaurant_id)
@@ -112,12 +128,18 @@ def new_category(request, restaurant_id: int):
                 this_category = Category.objects.get(name=existing_cat_name)
                 form = NewCategoryForm(
                     data=request.POST,
-                    restaurant_id=4,
+                    restaurant_id=restaurant_id,
                     instance=this_category
                 )
 
         if form.is_valid():
             form.save()
+            if len(form.food_not_in_res) > 0:
+                existing_cat_name = form.data['name']
+                this_category = Category.objects.get(name=existing_cat_name)
+                for food in form.food_not_in_res:
+                    this_category.food.add(food)
+                this_category.save()
             return redirect('res_owner:res_home_page')
 
     # This sends the context to render the edit_restaurant.html
@@ -125,12 +147,42 @@ def new_category(request, restaurant_id: int):
     return render(request, 'res_owner/new_category.html', context)
 
 
+def delete_category(request, category_name: str, restaurant_id: int):
+    """
+    The view function that handles the deletion of a category off a restaurant.
+    If the category still has data assigned to it, then simply remove the category off
+    every food in this restaurant. If not, then just delete it off the database.
+    :param request: a HttpRequest object specific to Django
+    :param restaurant_id: the id of the restaurant in the Restaurant table
+    :param category_name: the name of the category in the Category table
+    :return a redirect to the home page upon a successful POST request
+    """
+    if request.method == 'POST':
+        this_restaurant = Restaurant.objects.get(id=restaurant_id)
+        this_category = Category.objects.get(name=category_name)
+        foods = this_restaurant.food_set.all()
+        # Count the number of foods in this restaurant with this category
+        foods_with_same_cat = 0
+        for food in foods:
+            for food_category in food.category_set.all():
+                if food_category.name == category_name:
+                    this_category.food.remove(food)
+                    foods_with_same_cat += 1
+        # print(this_category.food.all())
+        # print(foods_with_same_cat)
+        # Basically, this means this category is used only by this restaurant. So delete it off the database also
+        # if foods_with_same_cat == this_category.food.count():
+        #     Category.objects.filter(name=category_name).delete() # DOES NOT WORK FOR NOW...
+    return redirect('res_owner:res_home_page')
+
+
 def cat_others(request, restaurant_id: int):
     """
        The page for category Others
        Show all foods not categorized in the restaurant
-       :param request: a Request object specific to Django
+       :param request: a HttpRequest object specific to Django
        :param restaurant_id: the id of the restaurant in the Restaurant table
+       :return the rendering of the HTML page 'res_owner/category.html'
    """
     this_restaurant = Restaurant.objects.get(id=restaurant_id)
     all_foods = this_restaurant.food_set.all()
@@ -152,7 +204,8 @@ def cat_others(request, restaurant_id: int):
 def res_settings(request):
     """
     The page for managing the restaurants
-    :param request: a Request object specific to Django
+    :param request: a HttpRequest object specific to Django
+    :return the rendering of the HTML page 'res_owner/res_settings.html'
     """
     restaurants = Restaurant.objects.order_by('name')
     # restaurants = Restaurant.objects.filter(owner=request.user).order_by('name')
@@ -166,7 +219,9 @@ def res_settings(request):
 def new_restaurant(request):
     """
     The page for adding in a new restaurant.
-    :param request: a Request object specific to Django
+    :param request: a HttpRequest object specific to Django
+    :return the rendering of the HTML page 'res_owner/new_restaurant.html' upon a GET request
+            or a redirect to the home page upon a successful POST request
     """
     if request.method != 'POST':
         # Blank form
@@ -187,8 +242,10 @@ def new_restaurant(request):
 def edit_restaurant(request, restaurant_id: int):
     """
     The page for editing an existing restaurant entry.
-    :param request: a Request object specific to Django
+    :param request: a HttpRequest object specific to Django
     :param restaurant_id: the id of the restaurant in the Restaurant table
+    :return The rendering of the HTML page 'res_owner/edit_restaurant.html' upon a GET request
+            or a redirect to the home page upon a successful POST request.
     """
     this_restaurant = Restaurant.objects.get(id=restaurant_id)
 
@@ -212,9 +269,10 @@ def edit_restaurant(request, restaurant_id: int):
 
 def delete_restaurant(request, restaurant_id: int):
     """
-    The page for deleting an existing restaurant entry.
-    :param request: a Request object specific to Django
+    The view function that handles the deletion of a restaurant
+    :param request: a HttpRequest object specific to Django
     :param restaurant_id: the id of the restaurant in the Restaurant table to delete
+    :return A redirect to the home page upon a successful POST request.
     """
     if request.method == 'POST':
         Restaurant.objects.filter(id=restaurant_id).delete()
@@ -224,8 +282,10 @@ def delete_restaurant(request, restaurant_id: int):
 def new_food(request, restaurant_id: int):
     """
     The page for adding in a new food without categories.
-    :param request: a Request object specific to Django
+    :param request: a HttpRequest object specific to Django
     :param restaurant_id: the id of the restaurant in the Restaurant table
+    :return The rendering of the HTML page 'res_owner/new_food.html' upon a GET request
+            or a redirect to the home page upon a successful POST request.
     """
     if request.method != 'POST':
         # Blank form
@@ -246,8 +306,10 @@ def new_food(request, restaurant_id: int):
 def edit_food(request, food_id: int):
     """
     The page for editing food info
-    :param request: a Request object specific to Django
-    :param food_id: the id of the food item in the food table
+    :param request: a HttpRequest object specific to Django
+    :param food_id: the id of the food item in the Food table
+    :return The rendering of the HTML page 'res_owner/edit_food.html' upon a GET request
+            or a redirect to the home page upon a successful POST request.
     """
     this_food = Food.objects.get(id=food_id)
     # Uncomment when user registration is completed
@@ -271,8 +333,9 @@ def edit_food(request, food_id: int):
 def delete_food(request, food_id: int):
     """
     The page for deleting an existing restaurant entry.
-    :param request: a Request object specific to Django
-    :param food_id: the id of the food in the food table to delete
+    :param request: a HttpRequest object specific to Django
+    :param food_id: the id of the food in the Food table to delete
+    :return A redirect to the home page upon a successful POST request
     """
     if request.method == 'POST':
         Food.objects.filter(id=food_id).delete()
