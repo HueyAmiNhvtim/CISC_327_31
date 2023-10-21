@@ -6,10 +6,11 @@
     <title>Search Results</title>
 </head>
 <body>
+    {% extends 'user/base.html' %}
     {% block content %}
     <h1>Search Results</h1>
     <ul>
-        <!--List of search results-->>
+        <!--List of search results-->
         {% for result in results%}
         <li>
             <a href="{% url 'user:restaurant' result.id %}">

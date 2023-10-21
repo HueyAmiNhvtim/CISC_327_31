@@ -6,10 +6,11 @@
     <title>View Orders</title>
 </head>
 <body>
+    {% extends 'user/base.html' %}
     {% block content %}
     <h1>Orders</h1>
     <ul>
-        <!--List of orders-->>
+        <!--List of orders-->
         {% for order in orders%}
         <li>
             <a href="{% url 'user:order' order.id %}">

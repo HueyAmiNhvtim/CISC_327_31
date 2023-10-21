@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Megabyte...</title>
+</head>
+<body>
+    <p>
+        <!--Maybe do a welcome or something...-->
+        <a href="{% url 'user:user_home_page' %}">Home</a>
+    </p>
+    <!--Will do stuff concerning user authentication later-->
+    {% block content %}{% endblock content %}
+    {% block settings %}{% endblock settings %}
+</body>
+</html>

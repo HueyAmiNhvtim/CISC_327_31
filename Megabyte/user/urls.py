@@ -14,8 +14,12 @@ urlpatterns = [
     path('search_results/', views.search_results, name='search_results'),
     # Restaurant page
     path('restaurant/<int:restaurant_id>', views.restaurant, name='restaurant'),
+    # Category page
+    path('category/<str:category_name>', views.category, name='category'),
+    # Food page
+    path('food/<str:food_name>', views.food, name='food'),
     # Shopping cart page
-    path('shopping_cart/<int:user_id>',
+    path('shopping_cart/',
          views.shopping_cart, name='shopping_cart'),
     # Order status page
     path('view_orders', views.view_orders, name='view_orders'),
