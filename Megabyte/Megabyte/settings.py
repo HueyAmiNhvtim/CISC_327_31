@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     # 'user.apps.UserConfig',
     # Our apps
+    'accounts',
     'res_owner',
     'user',
     # Django default apps
