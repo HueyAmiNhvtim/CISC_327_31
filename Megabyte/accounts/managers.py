@@ -8,11 +8,12 @@ class CustomUserManager(BaseUserManager):
     Unique identifier is the email rather than the usernames in the default one
     """
 
-    def create_user(self, email, password, is_res_owner: bool = False, **extra_fields):
+    def create_user(self, email, username, password, is_res_owner: bool = False, **extra_fields):
         """
         Create and save a user.
         The unique identifier of the user is their email.
         :param email: the email of user
+        :param username: their username
         :param password: their password
         :param is_res_owner: the boolean indicating if they are a restaurant owner or not.
                              Default is False.
@@ -21,16 +22,17 @@ class CustomUserManager(BaseUserManager):
         if not email:
             raise ValueError(_('The email must be set'))
         email = self.normalize_email(email)
-        user = self.model(email=email, is_res_owner=is_res_owner, **extra_fields)
-        user.set_passwird(password)
+        user = self.model(email=email, username=username, is_res_owner=is_res_owner, **extra_fields)
+        user.set_password(password)
         user.save()
         return user
 
-    def create_superuser(self, email, password, **extra_fields):
+    def create_superuser(self, email, username, password, **extra_fields):
         """
         Create and save a SuperUser (basically the admin).
         The unique identifier of the user is their email.
         :param email: the email of user
+        :param username: their username
         :param password: their password
         :return: an instance of the user
         """
@@ -39,6 +41,7 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
         extra_fields.setdefault('is_res_owner', True)  # Admin can be res_owner for debugging purposes
+        extra_fields.setdefault('username', username)
 
         # Check if existing fields in extra_fields violate what makes an admin
         if extra_fields.get('is_staff') is not True:
