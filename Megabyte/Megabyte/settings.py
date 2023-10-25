@@ -27,6 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Tell Django to use the new custom user class
+AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # Application definition
 
