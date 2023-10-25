@@ -4,8 +4,12 @@ from .models import CustomUser
 
 
 class CustomUserCreationForm(UserCreationForm):
-    pass
+    class Meta:
+        model = CustomUser
+        fields = ['email', 'username', 'password']
 
 
 class CustomUserChangeForm(UserChangeForm):
-    pass
+    class Meta:
+        model = CustomUser
+        fields = ['email', 'username', 'password']
