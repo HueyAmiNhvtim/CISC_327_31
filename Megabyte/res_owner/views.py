@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import RestaurantOwner, Restaurant, Food, Category
+from .models import Restaurant, Food, Category
 from .forms import RestaurantForm, FoodForm, CategorizingForm, NewCategoryForm
 from django.http import Http404
 # Create your views here.

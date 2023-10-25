@@ -18,9 +18,12 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('user/', include("user.urls")),
+    # Always add new apps here if you haven't already.
+
     path('admin/', admin.site.urls),
     # I'm not too sure about this...Should we have a separate home page to show different
     # pages for different kinds of users using the same URL?
-    path('res_owner/', include('res_owner.urls'))
+    path('accounts/', include('accounts.urls')),
+    path('res_owner/', include('res_owner.urls')),
+    path('user/', include('user.urls')),
 ]
