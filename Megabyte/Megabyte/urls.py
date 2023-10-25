@@ -19,7 +19,8 @@ from django.urls import path, include
 
 urlpatterns = [
     # Always add new apps here if you haven't already.
-
+    # Probably gonna make the default page to be the accounts page,
+    # and in the accounts page, the default url is the login page. muahahahaah
     path('admin/', admin.site.urls),
     # I'm not too sure about this...Should we have a separate home page to show different
     # pages for different kinds of users using the same URL?
