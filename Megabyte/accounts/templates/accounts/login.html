@@ -5,6 +5,18 @@
     <title>Title</title>
 </head>
 <body>
+    {% extends 'accounts/base.html' %}
+    {% block content %}
+        {% if form.errors %}
+          <p>Your username and password didn't match. Please try again.</p>
+        {% endif %}
+        <!-- Invoke the login view function to do stuff and render the page -->
+        <form action="{% url 'accounts:login' %}" method="post">
+          {% csrf_token %}
+          {{ form.as_div }}
 
+          <button name="submit">Login</button>
+        </form>
+    {% endblock content %}
 </body>
 </html>
