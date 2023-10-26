@@ -7,7 +7,6 @@
 <body>
     <!-- HOME PAGE NOT WORKING WHEN LOGGED IN.... -->
     <p>
-        <!--Something is wrong here....-->
         <a href="{% url 'accounts:home_page' %}">Home</a>
     </p>
     {% if user.is_authenticated %}

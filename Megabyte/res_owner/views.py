@@ -1,9 +1,28 @@
 from django.shortcuts import render, redirect
 from .models import Restaurant, Food, Category
 from .forms import RestaurantForm, FoodForm, CategorizingForm, NewCategoryForm
+
+from accounts.models import CustomUser
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 # Create your views here.
+
+
+@login_required
+def res_home_page(request, user_id):
+    """
+    The home page for the restaurant owner
+    Show all the categories of a restaurant
+    :param request: a HttpRequest object specific to Django
+    :param user_id: the id of the user
+    :return the rendering of the html page 'res_owner/res_home_page.html'
+    """
+    this_user = CustomUser.objects.get(id=user_id)
+    if this_user != request.user:
+        raise Http404
+    restaurants = this_user.restaurant_set.all()
+    context = {'user_id': user_id, 'restaurants': restaurants}
+    return render(request, 'res_owner/res_home_page.html', context)
 
 
 @login_required
@@ -96,7 +115,7 @@ def categorizing(request, category_name: str, restaurant_id: int):
                 for food in form.food_not_in_res:
                     this_category.food.add(food)
                 this_category.save()
-            return redirect('res_owner:res_home_page')
+            return redirect('res_owner:res_home_page', user_id=this_restaurant.restaurant_owner.id)
 
     # This sends the context to render the edit_restaurant.html
     context = {'form': form, 'category_name': category_name, 'restaurant_id': restaurant_id}
@@ -143,7 +162,7 @@ def new_category(request, restaurant_id: int):
                 for food in form.food_not_in_res:
                     this_category.food.add(food)
                 this_category.save()
-            return redirect('res_owner:res_home_page')
+            return redirect('res_owner:res_home_page', user_id=this_restaurant.restaurant_owner.id)
 
     # This sends the context to render the edit_restaurant.html
     context = {'form': form, 'restaurant_id': restaurant_id}
@@ -181,7 +200,7 @@ def delete_category(request, category_name: str, restaurant_id: int):
         # Basically, this means this category is used only by this restaurant. So delete it off the database also
         # if foods_with_same_cat == this_category.food.count():
         #     Category.objects.filter(name=category_name).delete() # DOES NOT WORK FOR NOW...
-    return redirect('res_owner:res_home_page')
+    return redirect('res_owner:res_home_page', user_id=this_restaurant.restaurant_owner.id)
 
 
 @login_required
@@ -223,7 +242,7 @@ def res_settings(request):
     # Disallow non restaurant owners from accessing restaurant-owner specific pages
     if request.user.is_res_owner is False:
         raise Http404
-    restaurants = Restaurant.objects.filter(owner=request.user).order_by('name')
+    restaurants = Restaurant.objects.filter(restaurant_owner=request.user).order_by('name')
     context = {
         'restaurants': restaurants
     }
@@ -251,9 +270,9 @@ def new_restaurant(request):
         # Might have to change it once custom form validation is implemented.
         if form.is_valid():
             new_restaurant = form.save(commit=False)
-            # new_restaurant.restaurant_owner = request.owner
+            new_restaurant.restaurant_owner = request.user
             new_restaurant.save()  # Save to the database
-            return redirect('res_owner:res_home_page')
+            return redirect('res_owner:res_home_page', user_id=new_restaurant.restaurant_owner.id)
     context = {'form': form}
     return render(request, 'res_owner/new_restaurant.html', context)
 
@@ -281,7 +300,7 @@ def edit_restaurant(request, restaurant_id: int):
         # Might have to change it once custom form validation is implemented.
         if form.is_valid():
             form.save()
-            return redirect('res_owner:res_home_page')
+            return redirect('res_owner:res_home_page', user_id=this_restaurant.restaurant_owner.id)
     # This sends the context to render the edit_restaurant.html
     context = {'form': form, 'restaurant': this_restaurant}
     return render(request, 'res_owner/edit_restaurant.html', context)
@@ -301,7 +320,7 @@ def delete_restaurant(request, restaurant_id: int):
         raise Http404
     if request.method == 'POST':
         Restaurant.objects.filter(id=restaurant_id).delete()
-    return redirect('res_owner:res_home_page')
+    return redirect('res_owner:res_home_page', user_id=this_restaurant.restaurant_owner.id)
 
 
 @login_required
@@ -328,7 +347,7 @@ def new_food(request, restaurant_id: int):
             new_food = form.save(commit=False)
             new_food.restaurant = this_restaurant
             new_food.save()  # Save to the database
-            return redirect('res_owner:res_home_page')
+            return redirect('res_owner:res_home_page', user_id=this_restaurant.restaurant_owner.id)
     context = {'form': form, 'restaurant_id': restaurant_id}
     return render(request, 'res_owner/new_food.html', context)
 
@@ -356,7 +375,8 @@ def edit_food(request, food_id: int):
         # Might have to change it once custom form validation is implemented.
         if form.is_valid():
             form.save()
-            return redirect('res_owner:res_home_page')
+            return redirect('res_owner:res_home_page',
+                            user_id=this_food.restaurant.restaurant_owner.id)
     # This sends the context to render the edit_restaurant.html
     context = {'form': form, 'food': this_food}
     return render(request, 'res_owner/edit_food.html', context)
@@ -371,10 +391,11 @@ def delete_food(request, food_id: int):
     :return A redirect to the home page upon a successful POST request
     """
     this_food = Food.objects.get(id=food_id)
+    this_restaurant = this_food.restaurant
     # Check to make sure different user cannot enter into other users' pages
     if this_food.restaurant.restaurant_owner != request.user:
         raise Http404
 
     if request.method == 'POST':
         Food.objects.filter(id=food_id).delete()
-    return redirect('res_owner:res_home_page')
+    return redirect('res_owner:res_home_page', user_id=this_restaurant.restaurant_owner.id)

@@ -22,19 +22,18 @@ def register(request):
     else:
         # POST data received. Process completed form
         form = CustomUserCreationForm(data=request.POST)
-
         if form.is_valid():
-            new_user = form.save(commit=False)
+            new_user = form.save()
             login(request, new_user)  # Might have to be changed since we're using
             # custom User class
             if new_user.is_res_owner is True:
-                return redirect('res_owner:res_home_page')
+                return redirect('res_owner:res_home_page', user_id=new_user.id)
             else:
                 return redirect('user:user_home_page')
     context = {'form': form}
     # if is_res_owner, send straight to restaurant_owner one
     # if user, send to the user equivalent.
-    return render(request, 'accounts/register.html', context)
+    return render(request, 'registration/register.html', context)
 
 
 @login_required
@@ -56,30 +55,28 @@ def edit_user(request, user_id):
         form = CustomUserCreationForm(data=request.POST)
 
         if form.is_valid():
-            form.save()
+            user = form.save()
             # if is_res_owner, send straight to restaurant_owner home page
             # if user, send to the user equivalent.
             if this_user.is_res_owner is True:
-                return redirect('res_owner:res_home_page')
+                return redirect('res_owner:res_home_page', user_id=user.id)
             else:
                 return redirect('user:user_home_page')
     context = {'form': form, 'user_id': user_id}
-    return render(request, 'accounts/edit_user.html', context)
+    return render(request, 'registration/edit_user.html', context)
 
 
-def home_page(request, email=""):
+def home_page(request):
     """
     Edit the user's info
     :param request: a HttpRequest object specific to Django
-    :param email: the email of the user
     """
     # No user
-    if email == "":
-        return redirect('accounts:register')
-    this_user = CustomUser.objects.get(email=email)
-    if this_user.is_res_owner is True:
-        restaurants = Restaurant.objects.filter(owner=request.user).order_by('name')
-        context = {'restaurants': restaurants, 'user_id': this_user.id, 'email': email}
+    if not request.user.email:
+        return redirect('accounts:ellis')
+    if request.user.is_res_owner is True:
+        restaurants = Restaurant.objects.filter(restaurant_owner=request.user).order_by('name')
+        context = {'restaurants': restaurants, 'user_id': request.user.id, 'email': request.user.email}
         return render(request, 'res_owner/res_home_page.html', context)
     else:
         return render(request, 'user/user_home_page.html')
@@ -89,4 +86,4 @@ def welcome(request):
     """
     Simple views function for the welcome page
     """
-    return render(request, 'accounts/welcome.html')
+    return render(request, 'registration/welcome.html')
