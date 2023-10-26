@@ -5,7 +5,7 @@
     <title>Title</title>
 </head>
 <body>
-    {% extends 'res_owner/base.html' %}
+    {% extends 'accounts/base.html' %}
     {% block content %}
         <form action="{% url 'res_owner:new_restaurant' %}" method="post">
             {% csrf_token %}

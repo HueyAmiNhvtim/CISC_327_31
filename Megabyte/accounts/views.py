@@ -5,6 +5,9 @@ from django.http import Http404
 
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from .models import CustomUser
+from res_owner import Restaurant
+# Do same thing for User later.
+
 # Create your views here.
 
 
@@ -22,8 +25,8 @@ def register(request):
 
         if form.is_valid():
             new_user = form.save(commit=False)
-            login(request, new_user)   # Might have to be changed since we're using
-                                       # custom User class
+            login(request, new_user)  # Might have to be changed since we're using
+            # custom User class
             if new_user.is_res_owner is True:
                 return redirect('res_owner:res_home_page')
             else:
@@ -63,3 +66,20 @@ def edit_user(request, user_id):
     context = {'form': form}
     return render(request, 'accounts/edit_user.html', context)
 
+
+def home_page(request, user_id: int = -1):
+    """
+    Edit the user's info
+    :param request: a HttpRequest object specific to Django
+    :param user_id: the id of the user. Should be unique too I think
+    """
+    # No user
+    if user_id == -1:
+        return redirect('accounts:register')
+    this_user = CustomUser.objects.get(id=user_id)
+    if this_user.is_res_owner is True:
+        restaurants = Restaurant.objects.filter(owner=request.user).order_by('name')
+        context = {"restaurants": restaurants}
+        return render(request, 'res_owner/res_home_page.html', context)
+    else:
+        return render(request, "user/user_home_page.html")
