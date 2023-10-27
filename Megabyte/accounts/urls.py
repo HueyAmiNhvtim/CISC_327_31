@@ -9,7 +9,9 @@ urlpatterns = [
     path('', views.welcome, name='ellis'),
     path('user_stuff/', include(urls)),  # Hopefully this will show the login page first...
     path('register/', views.register, name='register'),
-    path('edit_user/<user_id>/', views.edit_user, name='edit_user'),
+    path('edit_user/', views.edit_user, name='edit_user'),
+    path('<int:user_id>/password/', views.password_change, name='password_change'),
+    path('password_change/', views.password_change_done, name='password_change_done'),
     # Home page for both user and res_owner
     path('home/<int:user_id>/', views.home_page, name='home_page'),
     # Home page for optional argument....

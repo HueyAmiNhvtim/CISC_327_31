@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 from django.http import Http404
 
 from .forms import CustomUserCreationForm, CustomUserChangeForm
@@ -37,33 +39,64 @@ def register(request):
 
 
 @login_required
-def edit_user(request, user_id):
+def edit_user(request):
     """
     Edit the user's info
     :param request: a HttpRequest object specific to Django
-    :param user_id: the id of the user. Should be unique too I think
     """
-    this_user = CustomUser.objects.get(id=user_id)
-    # Check to make sure if user cannot edit other user profile
-    if this_user != request.user:
-        raise Http404
     if request.method != 'POST':
         # Display the filled in registration form
-        form = CustomUserChangeForm(instance=this_user)
+        form = CustomUserChangeForm(instance=request.user)
     else:
         # POST data received. Process completed form
-        form = CustomUserCreationForm(data=request.POST)
+        form = CustomUserChangeForm(instance=request.user, data=request.POST)
+
+        if form.is_valid():
+            form.save()
+            # if is_res_owner, send straight to restaurant_owner home page
+            # if user, send to the user equivalent.
+            if request.user.is_res_owner is True:
+                return redirect('res_owner:res_home_page', user_id=request.user.id)
+            else:
+                return redirect('user:user_home_page')
+    context = {'form': form}
+    return render(request, 'registration/edit_user.html', context)
+
+
+@login_required
+def password_change(request, user_id):
+    """
+    Change the user's password
+    :param request: a HttpRequest object specific to Django
+    :param user_id: the id of the user
+    """
+    if request.method != 'POST':
+        # Display the filled in registration form
+        form = PasswordChangeForm(user=request.user)
+    else:
+        # POST data received. Process completed form
+        form = PasswordChangeForm(user=request.user, data=request.POST)
 
         if form.is_valid():
             user = form.save()
+            update_session_auth_hash(request, user)
             # if is_res_owner, send straight to restaurant_owner home page
             # if user, send to the user equivalent.
-            if this_user.is_res_owner is True:
-                return redirect('res_owner:res_home_page', user_id=user.id)
+            if request.user.is_res_owner is True:
+                return redirect('res_owner:res_home_page', user_id=request.user.id)
             else:
                 return redirect('user:user_home_page')
-    context = {'form': form, 'user_id': user_id}
-    return render(request, 'registration/edit_user.html', context)
+    context = {'form': form, 'user_id': request.user.id}
+    return render(request, 'registration/change_password.html', context)
+
+
+@login_required
+def password_change_done(request):
+    """
+    Change the user's password
+    :param request: a HttpRequest object specific to Django
+    """
+    return render(request, 'registration/password_change_done.html')
 
 
 def home_page(request):

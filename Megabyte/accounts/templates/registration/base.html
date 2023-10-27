@@ -25,6 +25,10 @@
             {% csrf_token %}
             <button name="submit">Logout</button>
         </form>
+        <form action="{% url 'accounts:edit_user'%}">
+            {% csrf_token %}
+            <button name="submit">Edit your info?</button>
+        </form>
     {% endif %}
 </body>
 </html>
