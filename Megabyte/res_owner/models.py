@@ -1,24 +1,9 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 
+User = settings.AUTH_USER_MODEL
 
 # Create your models here.
-class RestaurantOwner(models.Model):
-    """
-    A model representation of a restaurant owner
-    Will be deleted once user set up is done
-    """
-    # There is no way a person's name is that long
-    name = models.CharField(max_length=100)
-    email = models.CharField(max_length=254)
-    password = models.CharField(max_length=128)
-
-    # For user...The User should be the Res_Owner_specific table one.
-    associating_user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    def __str__(self):
-        """Return the name of the owner"""
-        return self.name
 
 
 class Restaurant(models.Model):
@@ -51,7 +36,7 @@ class Food(models.Model):
     """
     A model representation of a food item.
     A collection of food with a specific restaurant foreign key represents
-    that restaurant's menu.
+    that restaurant's menu. A restaurant can have multiple food items.
     """
     name = models.CharField(max_length=200)
 
@@ -69,6 +54,7 @@ class Category(models.Model):
     A model representation of a food category
     A food item can have multiple categories.
     A category can have multiple food items associating with it.
+    And a food item can have multiple categories associated with it.
     """
     # Allow existing owner to choose categories created by other owners through
     # a single database!

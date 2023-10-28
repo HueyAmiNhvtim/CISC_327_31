@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search</title>
+</head>
+<body>
+    {% extends 'user/base.html' %}
+    {% block content %}
+        <form action="{% url 'user:search_results' %}" method="post">
+            {% csrf_token %}
+            <label> 
+                Please enter your location in the following format:
+                Street address,City,Province,Country,Postal Code
+            </label>
+            <input type="text" name="location" required>
+            <button name="search_button">Search</button>
+        </form>
+    {% endblock content %}
+</body>
+</html>

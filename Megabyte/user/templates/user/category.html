@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Category</title>
+</head>
+<body>
+    {% extends 'user/base.html' %}
+    {% block content %}
+    <h1>Category</h1>
+        <ul>
+            <!--List of food-->
+            {% for food in food_items%}
+            <li>
+                <a href="{% url 'user:food' food.name %}">
+                {{ food.name }}  ${{ food.price }}
+                <br />
+                <img src={{food.image_path}}>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    {% endblock content %}
+</body>
+</html>

@@ -5,7 +5,7 @@
     <title>Title</title>
 </head>
 <body>
-    {% extends 'res_owner/base.html' %}
+    {% extends 'registration/base.html' %}
     {% block content %}
         <p>Restaurant: {{ restaurant_name }} <br>
             All foods associating with category {{ category_name }} </p>
@@ -19,6 +19,10 @@
                     </p>
                     <form action="{% url 'res_owner:edit_food' food.id %}" method="get">
                         <button name="edit_food_button">Edit?</button>
+                    </form>
+                    <form action="{% url 'res_owner:delete_food' food.id %}" method="post">
+                        {% csrf_token %}
+                        <button name="delete_food_button">Delete?</button>
                     </form>
                 </li>
             {% endfor %}

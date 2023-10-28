@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Megabyte...</title>
+</head>
+<body>
+    <!-- HOME PAGE NOT WORKING WHEN LOGGED IN.... -->
+    <p>
+        <a href="{% url 'accounts:home_page' %}">Home</a>
+    </p>
+    {% if user.is_authenticated %}
+        Hello, {{ user.username }}.
+    {% else %}
+        <a href="{% url 'accounts:register' %}">Register</a>
+        <a href="{% url 'accounts:login' %}">Login</a>
+    {% endif %}
+    <!--Will do stuff concerning user authentication later-->
+    {% block content %}{% endblock content %}
+    {% block settings %}{% endblock settings %}
+    {% if user.is_authenticated %}
+        <hr />  <!--The horizontal rule. Keep the logout button below any other content on the page-->
+        <!--Logout requests have to be POST; otherwise, attackers can easily force logout requests-->
+        <form action="{% url 'accounts:logout' %}" method="post">
+            {% csrf_token %}
+            <button name="submit">Logout</button>
+        </form>
+        <form action="{% url 'accounts:edit_user'%}">
+            {% csrf_token %}
+            <button name="submit">Edit your info?</button>
+        </form>
+    {% endif %}
+</body>
+</html>
