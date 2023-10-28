@@ -11,11 +11,11 @@
         <form action="{% url 'user:search_results' %}" method="post">
             {% csrf_token %}
             <label> 
-                Please enter your location in the following format:
-                Street address,City,Province,Country,Postal Code
+                Please enter your location to begin searching for restaurants in your local area.
             </label>
-            <input type="text" name="location" required>
-            <button name="search_button">Search</button>
+            {{ form.as_div }}
+        <br>
+        <button name="search_button">Search</button>
         </form>
     {% endblock content %}
 </body>

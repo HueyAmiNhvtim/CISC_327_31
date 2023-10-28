@@ -8,8 +8,22 @@
 <body>
     {% extends 'user/base.html' %}
     {% block content %}
-    <h1>Order</h1>
-
+    <h1>Order #{{ order.id }}</h1>
+    <p>Ordered on {{ order.date_and_time }}</p>
+    <ul>
+        <li>
+            Items: {{ order.items }}
+        </li>
+        <li>
+            Restaurants: {{ order.restaurants }}
+        </li>
+        <li>
+            Prices: {{ order.prices }}
+        </li>
+        <li>
+            Quantities: {{ order.quantities }}
+        </li>
+    </ul>
     {% endblock content %}
 </body>
 </html>

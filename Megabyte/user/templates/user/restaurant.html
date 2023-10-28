@@ -11,9 +11,9 @@
     <h1>Restaurant</h1>
         <ul>
             <!--List of categories-->
-            {% for category in categories%}
+            {% for category in categories %}
             <li>
-                <a href="{% url 'user:category' category.name %}">
+                <a href="{% url 'user:category' restaurant_id category.name %}">
                 {{ category.name }}  
                 </a>
             </li>
