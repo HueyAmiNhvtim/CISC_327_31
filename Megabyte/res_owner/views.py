@@ -3,6 +3,8 @@ from .models import Restaurant, Food, Category
 from .forms import RestaurantForm, FoodForm, CategorizingForm, NewCategoryForm
 
 from accounts.models import CustomUser
+from user.models import Order
+
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 # Create your views here.
@@ -399,3 +401,22 @@ def delete_food(request, food_id: int):
     if request.method == 'POST':
         Food.objects.filter(id=food_id).delete()
     return redirect('res_owner:res_home_page', user_id=this_restaurant.restaurant_owner.id)
+
+
+# This might be a bad one....
+# This require order to have a foreign key to the restaurant.
+@login_required
+def order_management(request):
+    """
+    The page for viewing the list of orders.
+    :param request: a HttpRequest object specific to Django
+    """
+    # Prevent normal user from accessing the restaurant owner pages
+    if request.user.is_res_owner is False:
+        raise Http404
+    all_restaurants = request.user.restaurant_set.all()
+    orders = []
+    for a_restaurant in all_restaurants:
+        orders.append(list(a_restaurant.order_set.all()))
+    context = {'orders': orders}
+    return render(request, 'res_owner/orders.html', context)

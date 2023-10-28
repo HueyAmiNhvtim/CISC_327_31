@@ -14,6 +14,8 @@ urlpatterns = [
     path('new_restaurant', views.new_restaurant, name='new_restaurant'),
     # Page for deleting the restaurant entry
     path('remove_restaurant/<int:restaurant_id>', views.delete_restaurant, name='delete_restaurant'),
+    # Page for viewing orders by the users
+    path('orders/', views.order_management, name='order_management'),
 
     # Page for each restaurant
     path('restaurants/<int:restaurant_id>/', views.restaurant, name='restaurant'),
