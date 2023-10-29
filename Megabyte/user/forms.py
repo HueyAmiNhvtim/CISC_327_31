@@ -14,13 +14,13 @@ class SearchForm(forms.ModelForm):
                   'country', 'postal_code']
 
 
-class AddToCartForm(forms.ModelForm):
+class CartForm(forms.ModelForm):
     class Meta:
         # Tell Django to base this form off the Food model fields
         model = ShoppingCart
         # Fields you with to be able to edit must match the fields variables
         # in the corresponding model!
-        fields = ['quantity']
+        fields = ['quantities']
 
 
 class UserDataForm(forms.ModelForm):

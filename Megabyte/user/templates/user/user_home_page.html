@@ -16,6 +16,10 @@
             {% csrf_token %}
             <button name="search_button">Search</button>
         </form>
+        <form action="{% url 'user:shopping_cart' user.id %}" method="post">
+            {% csrf_token %}
+            <button name="search_button">View Shopping Cart</button>
+        </form>
         <form action="{% url 'user:view_orders' user.id %}" method="post">
             {% csrf_token %}
             <button name="view_orders_button">View Orders</button>

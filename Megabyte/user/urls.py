@@ -22,8 +22,11 @@ urlpatterns = [
     path('restaurant/<int:restaurant_id>/<str:category_name>/<str:food_name>',
          views.food, name='food'),
     # Shopping cart page
-    path('shopping_cart/',
+    path('shopping_cart/<int:user_id>',
          views.shopping_cart, name='shopping_cart'),
+    # Change item quantity page
+    path('shopping_cart/<int:user_id>/<str:item>',
+         views.edit_quantity, name='edit_quantity'),
     # Order status page
     path('<int:user_id>/view_orders', views.view_orders, name='view_orders'),
     # Order details page

@@ -15,15 +15,14 @@ class UserData(models.Model):
 class ShoppingCart(models.Model):
     """A model representation of the shopping cart"""
     # 50000 is a placeholder, as max_length is required
-    item = models.CharField(max_length=50000)
-    restaurant = models.CharField(max_length=50000)
-    quantity = models.PositiveIntegerField()
-    price = models.DecimalField(
-        default=0, decimal_places=2, max_digits=12)
+    items = models.CharField(max_length=50000)
+    restaurants = models.CharField(max_length=50000)
+    prices = models.CharField(max_length=50000)
+    quantities = models.CharField(max_length=50000)
 
     def __str__(self):
         """Return the item names"""
-        return self.item
+        return self.items
 
 
 class Location(models.Model):

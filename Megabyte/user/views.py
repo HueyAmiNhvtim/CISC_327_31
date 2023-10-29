@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import UserData, ShoppingCart, Location, Order
 from res_owner.models import Restaurant, Category, Food
-from .forms import UserDataForm, SearchForm, AddToCartForm
+from .forms import UserDataForm, SearchForm, CartForm
 
 
 def user_home_page(request):
@@ -117,29 +117,69 @@ def food(request, restaurant_id: int, category_name: str, food_name: str):
         restaurant=this_restaurant, name=food_name)
     if request.method != 'POST':
         # Blank form
-        form = AddToCartForm()
+        form = CartForm()
     else:
         # POST request type confirmed; processing data
-        form = AddToCartForm(data=request.POST)
+        form = CartForm(data=request.POST)
         if form.is_valid():
             new_cart = form.save(commit=False)
             new_cart.item = food_name
             new_cart.price = this_food_item.price
-            new_cart.restaurant = restaurant_id
+            new_cart.restaurant = this_restaurant
             new_cart.save()
             return redirect('shopping_cart/')
     context = {"form": form}
     return render(request, 'user/food.html', context)
 
 
-def shopping_cart(request):
+def shopping_cart(request, user_id: int):
     """
     The page to view the user's shopping cart
     :param request: a Request object specific to Django
+    :param user_id: the id of the user
     """
-    cart = ShoppingCart.objects.order_by('item')
-    context = {"cart": cart}
-    return render(request, 'user/shopping_cart.html')
+    this_user = UserData.objects.get(id=user_id)
+    cart = ShoppingCart.objects.get(id=user_id)
+
+    # Split character fields into lists
+    cart_items = cart.items.split(',')
+    cart_restaurants = cart.restaurants.split(',')
+    cart_prices = cart.prices.split(',')
+    cart_quantities = cart.quantities.split(',')
+
+    context = {"user": this_user,
+               "cart": cart,
+               "cart_items": cart_items,
+               "cart_restaurants": cart_restaurants,
+               "cart_prices": cart_prices,
+               "cart_quantities": cart_quantities,
+               "range": range(len(cart_items))}
+    return render(request, 'user/shopping_cart.html', context)
+
+
+def edit_quantity(request, user_id: int, res_name: str, food_name: str):
+    """
+    The page to change the amount of an item in a cart
+    :param request: a Request object specific to Django
+    :param user_id: the id of the user
+    :param item: item whose quantity is to be changed
+    """
+    this_user = UserData.objects.get(id=user_id)
+    this_restaurant = Restaurant.objects.get(name=res_name)
+    this_food_item = Food.objects.get(
+        restaurant=this_restaurant, name=food_name)
+    if request.method != 'POST':
+        # Initial request: Pre-fill form with the current entry
+        form = CartForm(instance=this_food_item)
+    else:
+        # POST request type confirmed, process data
+        form = CartForm(instance=this_food_item, data=request.POST)
+        # Might have to change it once custom form validation is implemented.
+        if form.is_valid():
+            form.save()
+            return redirect('res_owner:res_home_page')
+    context = {"user": this_user, "form": form}
+    return render(request, 'user/edit_quantity.html', context)
 
 
 def view_orders(request, user_id: int):

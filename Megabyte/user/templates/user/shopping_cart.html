@@ -9,6 +9,35 @@
     {% extends 'user/base.html' %}
     {% block content %}
     <h1>Shopping Cart</h1>
+    <ul>
+        <!--List of items in shopping cart-->
+        {% for item in cart_items %}
+            {% for restaurant in cart_restaurants %}
+                {% for price in cart_prices %}
+                    {% for quantity in cart_quantities %}
+                        <li>
+                            Item: {{ item }} 
+                            <br>
+                            Restaurant: {{ restaurant }}
+                            <br>
+                            Price per item: ${{ price }}
+                            <br>
+                            Quantity: {{ quantity }}
+                        </li>
+                        <form action="{% url 'user:edit_quantity' user.id item %}" method="post">
+                            {% csrf_token %}
+                            <button name="checkout_button">Edit</button>
+                        </form>
+                    {% endfor %}
+                {% endfor %}
+            {% endfor %}
+        {% endfor %}
+    </ul>
+    <form action="{% url 'user:view_orders' user.id %}" method="post">
+        {% csrf_token %}
+        <button name="checkout_button">Checkout</button>
+    </form>
+
     {% endblock content %}
 </body>
 </html>
