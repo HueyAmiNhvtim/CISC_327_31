@@ -16,7 +16,8 @@ urlpatterns = [
     path('remove_restaurant/<int:restaurant_id>', views.delete_restaurant, name='delete_restaurant'),
     # Page for viewing orders by the users
     path('orders/', views.order_management, name='order_management'),
-
+    # Page for changing the status of each order
+    path('order/<int:order_id>', views.change_order_status, name='order_change_status'),
     # Page for each restaurant
     path('restaurants/<int:restaurant_id>/', views.restaurant, name='restaurant'),
     # Page for deleting the category, well, not completely deleting off the database of course.

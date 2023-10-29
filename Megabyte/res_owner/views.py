@@ -410,8 +410,10 @@ def order_management(request):
     """
     The page for viewing the list of orders.
     :param request: a HttpRequest object specific to Django
+    :return the rendering of the HTML page orders.html
     """
     # Prevent normal user from accessing the restaurant owner pages
+    # Allowing res_owner to delete past order is QOL really....
     if request.user.is_res_owner is False:
         raise Http404
     all_restaurants = request.user.restaurant_set.all()
@@ -420,3 +422,25 @@ def order_management(request):
         orders.append(list(a_restaurant.order_set.all()))
     context = {'orders': orders}
     return render(request, 'res_owner/orders.html', context)
+
+
+# WIP
+@login_required
+def change_order_status(request, order_id):
+    """
+    The page for changing the status of the order.
+    :param request: a HttpRequest object specific to Django
+    :param order_id: the id of the order in the Order table
+    """
+    this_order = Order.objects.get(id=order_id)
+    # Allow only the owner of this order's restaurant to see the order
+    if this_order.restaurants.restaurant_owner != request.user:
+        raise Http404
+    if request.method != 'POST':
+        pass
+    else:
+        pass
+    # The form should be similar to the radio button except you can only choose one.
+    available_statuses = ["Waiting", "Rejected", "Accepted", "Delivered"]
+    context = {'availabe_statuses': available_statuses}
+    return render(request, 'res_owner/change_order_status.html', context)

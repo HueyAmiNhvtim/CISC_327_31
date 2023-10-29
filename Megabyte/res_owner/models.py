@@ -25,8 +25,6 @@ class Restaurant(models.Model):
     # Delete blank and null once that happens
     restaurant_owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
 
-    # restaurant_owner = models.ForeignKey(RestaurantOwner, on_delete=models.CASCADE)
-
     def __str__(self):
         """Return the name of the restaurant"""
         return self.name

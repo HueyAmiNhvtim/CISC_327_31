@@ -1,9 +1,7 @@
 from django import forms
 
 from .models import Restaurant, Food, Category
-
-
-# If custom user.... import customer_user here or sth
+from user.models import Order
 
 
 class RestaurantForm(forms.ModelForm):
@@ -78,3 +76,9 @@ class NewCategoryForm(forms.ModelForm):
     )
 
 
+# WIP
+# class ChangeOrderStatus(forms.ModelForm):
+#     class Meta:
+#         model = Order
+#         fields = ['status']
+#     pass
