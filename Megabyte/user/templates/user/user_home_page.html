@@ -6,7 +6,7 @@
     <title>Home Page</title>
 </head>
 <body>
-    {% extends 'user/base.html' %}
+    {% extends 'registration/base.html' %}
     {% block content %}
         <form action="{% url 'user:user_settings' %}" method="post">
             {% csrf_token %}
