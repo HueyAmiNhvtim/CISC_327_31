@@ -9,7 +9,8 @@
     {% block content %}
         <form action="{% url 'accounts:edit_user' %}" method="post">
           {% csrf_token %}
-          {{ form.as_div }}
+          <!-- {{ form.as_div }} -->
+          {{ form }}
           <button name="submit">Apply changes?</button>
         </form>
     {% endblock content %}

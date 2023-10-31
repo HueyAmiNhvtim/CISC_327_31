@@ -13,5 +13,5 @@ urlpatterns = [
     # Home page for both user and res_owner
     path('home/<int:user_id>/', views.home_page, name='home_page'),
     # Home page for optional argument....
-    path(r'^home/$', views.home_page, name='home_page')
+    path(r'^home/$', views.home_page, name='home_page') 
 ]
