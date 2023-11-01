@@ -5,7 +5,7 @@
     <title>Title</title>
 </head>
 <body>
-    {% extends 'res_owner/base.html' %}
+    {% extends 'registration/base.html' %}
     {% block content %}
         <p>Restaurant: {{ restaurant_name }}: <br> All categories</p>
         <!--Display all restaurants in an unordered list-->
@@ -15,6 +15,10 @@
                     <a href="{% url 'res_owner:category' category.name restaurant_id %}">
                         {{ category.name }}
                     </a>
+                    <form action="{% url 'res_owner:delete_category' category.name restaurant_id %}" method="post">
+                        {% csrf_token %}
+                        <button name="delete_cat_button">Delete?</button>
+                    </form>
                 </li>
             {% endfor %}
             <li>
