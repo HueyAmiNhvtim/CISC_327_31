@@ -6,23 +6,20 @@ class UserData(models.Model):
     username = models.CharField(max_length=100)
     email = models.EmailField()
     password = models.CharField(max_length=128)
+    cart = models.JSONField(default=list)
 
     def __str__(self):
         """Return the username of the user"""
         return self.username
 
 
-class ShoppingCart(models.Model):
-    """A model representation of the shopping cart"""
-    # 50000 is a placeholder, as max_length is required
-    items = models.CharField(max_length=50000)
-    restaurants = models.CharField(max_length=50000)
-    prices = models.CharField(max_length=50000)
-    quantities = models.CharField(max_length=50000)
+class Quantity(models.Model):
+    """A model representation of the amount of an item"""
+    quantity = models.CharField(max_length=4)
 
     def __str__(self):
-        """Return the item names"""
-        return self.items
+        """Return the quantity"""
+        return self.quantity
 
 
 class Location(models.Model):
@@ -40,12 +37,10 @@ class Location(models.Model):
 
 class Order(models.Model):
     """Model representation of an order"""
-    user_id = models.PositiveIntegerField()
+    status = models.TextChoices("status", "Sent Accepted Prepared Delivered")
+    user = models.PositiveIntegerField()
     date_and_time = models.DateTimeField()
-    items = models.CharField(max_length=50000)
-    restaurants = models.CharField(max_length=50000)
-    quantities = models.CharField(max_length=50000)
-    prices = models.CharField(max_length=50000)
+    cart = models.JSONField(default=list)
 
     def __str__(self):
         """Return the order id"""

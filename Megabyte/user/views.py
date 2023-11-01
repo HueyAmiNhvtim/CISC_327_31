@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import UserData, ShoppingCart, Location, Order
+from .models import UserData, Quantity, Location, Order
 from res_owner.models import Restaurant, Category, Food
-from .forms import UserDataForm, SearchForm, CartForm
+from .forms import UserDataForm, SearchForm, CartForm, OrderForm
+import datetime
 
 
 def user_home_page(request):
@@ -28,7 +29,7 @@ def user_settings(request, user_id: int):
         form = UserDataForm(instance=this_user, data=request.POST)
         if form.is_valid():
             form.save()
-            return redirect('res_owner:user_settings')
+            return redirect('user:user_settings', user_id)
     context = {'form': form, 'user': this_user}
     return render(request, "user/user_settings.html", context)
 
@@ -128,8 +129,50 @@ def food(request, restaurant_id: int, category_name: str, food_name: str):
             new_cart.restaurant = this_restaurant
             new_cart.save()
             return redirect('shopping_cart/')
-    context = {"form": form}
+    context = {"form": form, "food": this_food_item,
+               "restaurant": this_restaurant}
     return render(request, 'user/food.html', context)
+
+
+def add_to_shopping_cart(request, user_id: int, restaurant_id: int, food_id: int):
+    """
+    Add food to a user's shopping cart
+    :param request: a Request object specific to Django
+    :param user_id: the id of the user
+    :param restaurant_id: the id of the restaurant
+    :param food_id: the id of the food item
+    """
+    this_user = UserData.objects.get(id=user_id)
+    this_restaurant = Restaurant.objects.get(id=restaurant_id)
+    this_food = Food.objects.get(id=food_id)
+
+    if request.method != 'POST':
+        # Blank form
+        form = CartForm()
+    else:
+        # POST request type confirmed; processing data
+        form = CartForm(data=request.POST)
+        if form.is_valid():
+            food_quantity = form.save(commit=False)
+            food_in_cart = False
+            for i in this_user.cart:
+                # If the food item already exists in the cart,
+                # add to the quantity of the item
+                if i[4] == str(food_id):
+                    i[3] = str(int(i[3]) + int(food_quantity.quantity))
+                    food_in_cart = True
+                    break
+            if not food_in_cart:
+                # If the food item is not in the cart already,
+                # add it to the cart
+                this_user.cart.append([this_food.name, this_restaurant.name,
+                                       str(this_food.price),
+                                       food_quantity.quantity, food_id])
+            this_user.save()
+            return redirect('user:shopping_cart', user_id)
+    context = {"user": this_user,
+               "range": range(len(this_user.cart["items"]))}
+    return render(request, 'user/shopping_cart.html', context)
 
 
 def shopping_cart(request, user_id: int):
@@ -139,25 +182,12 @@ def shopping_cart(request, user_id: int):
     :param user_id: the id of the user
     """
     this_user = UserData.objects.get(id=user_id)
-    cart = ShoppingCart.objects.get(id=user_id)
-
-    # Split character fields into lists
-    cart_items = cart.items.split(',')
-    cart_restaurants = cart.restaurants.split(',')
-    cart_prices = cart.prices.split(',')
-    cart_quantities = cart.quantities.split(',')
-
     context = {"user": this_user,
-               "cart": cart,
-               "cart_items": cart_items,
-               "cart_restaurants": cart_restaurants,
-               "cart_prices": cart_prices,
-               "cart_quantities": cart_quantities,
-               "range": range(len(cart_items))}
+               "range": range(len(this_user.cart))}
     return render(request, 'user/shopping_cart.html', context)
 
 
-def edit_quantity(request, user_id: int, res_name: str, food_name: str):
+def edit_quantity(request, user_id: int, food_id: int):
     """
     The page to change the amount of an item in a cart
     :param request: a Request object specific to Django
@@ -165,21 +195,60 @@ def edit_quantity(request, user_id: int, res_name: str, food_name: str):
     :param item: item whose quantity is to be changed
     """
     this_user = UserData.objects.get(id=user_id)
-    this_restaurant = Restaurant.objects.get(name=res_name)
-    this_food_item = Food.objects.get(
-        restaurant=this_restaurant, name=food_name)
+    this_food = Food.objects.get(id=food_id)
     if request.method != 'POST':
         # Initial request: Pre-fill form with the current entry
-        form = CartForm(instance=this_food_item)
+        form = CartForm()
     else:
         # POST request type confirmed, process data
-        form = CartForm(instance=this_food_item, data=request.POST)
+        form = CartForm(data=request.POST)
         # Might have to change it once custom form validation is implemented.
         if form.is_valid():
-            form.save()
-            return redirect('res_owner:res_home_page')
-    context = {"user": this_user, "form": form}
+            new_quantity = form.save(commit=False)
+            for i in range(len(this_user.cart)):
+                # Change the amount of the specified item
+                if int(this_user.cart[i][4]) == food_id:
+                    this_user.cart[i][3] = new_quantity.quantity
+                    this_user.save()
+                    break
+            return redirect('user:shopping_cart', user_id)
+    context = {"user": this_user, "food": this_food, "form": form}
     return render(request, 'user/edit_quantity.html', context)
+
+
+def remove_food(request, user_id: int, food_id: int):
+    this_user = UserData.objects.get(id=user_id)
+    if request.method == 'POST':
+        for i in range(len(this_user.cart)):
+            # Change the amount of the specified item
+            if int(this_user.cart[i][4]) == food_id:
+                this_user.cart.pop(i)
+                this_user.save()
+                break
+    return redirect('user:shopping_cart', user_id)
+
+
+def checkout(request, user_id: int):
+    this_user = UserData.objects.get(id=user_id)
+    if request.method == 'POST':
+        form = OrderForm(data=request.POST)
+        if form.is_valid():
+            # Add info to Order model
+            order_info = form.save(commit=False)
+            order_info.status = "Sent"
+            order_info.user = this_user.id
+            order_info.date_and_time = datetime.datetime.now()
+            order_info.cart = this_user.cart.copy()
+            order_info.save()
+
+            # Reset the user's shopping cart
+            this_user.cart = []
+            this_user.save()
+        return redirect('user:view_orders', user_id)
+
+    # This sends the context to render the view_orders.html
+    context = {'form': form, 'user': this_user}
+    return render(request, 'user/view_orders.html', context)
 
 
 def view_orders(request, user_id: int):
@@ -189,7 +258,7 @@ def view_orders(request, user_id: int):
     :param user_id: the id of the user
     """
     this_user = UserData.objects.get(id=user_id)
-    orders = Order.objects.order_by('date_and_time')
+    orders = Order.objects.filter(user=user_id)
     context = {"user": this_user, "orders": orders}
     return render(request, 'user/view_orders.html', context)
 
