@@ -27,6 +27,10 @@
             {% csrf_token %}
             <button name="res_settings_button">Restaurant Settings</button>
         </form>
+        <form action="{% url 'res_owner:order_management' %}" method="get">
+            {% csrf_token %}
+            <button name="res_settings_button">All orders</button>
+        </form>
     {% endblock settings %}
 </body>
     <!-- including settings where you can change, modify owner's info, and modify restaurant's info-->
