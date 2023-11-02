@@ -11,19 +11,19 @@ from django.http import Http404
 
 
 @login_required
-def res_home_page(request, user_id):
+def res_home_page(request):
     """
     The home page for the restaurant owner
     Show all the categories of a restaurant
     :param request: a HttpRequest object specific to Django
-    :param user_id: the id of the user
     :return the rendering of the html page 'res_owner/res_home_page.html'
     """
-    this_user = CustomUser.objects.get(id=user_id)
-    if this_user != request.user:
+    this_user = CustomUser.objects.get(id=request.user.id)
+    # Make sure non-res-owners can't get access to the restaurant owner page
+    if not this_user.is_res_owner:
         raise Http404
     restaurants = this_user.restaurant_set.all()
-    context = {'user_id': user_id, 'restaurants': restaurants}
+    context = {'restaurants': restaurants}
     return render(request, 'res_owner/res_home_page.html', context)
 
 

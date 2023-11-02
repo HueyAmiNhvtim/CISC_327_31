@@ -77,22 +77,27 @@ class TestFoodModel(TestCase):
         # Create the restaurant object for testing.
         # user testing will run its own testing
         restaurant = Restaurant.objects.create(
-            name='Almond', location='Rubicon-231',
+            name='Almondo', location='Rubicon-231',
             image_path='res_owner/images/rubicon-231.png',
             restaurant_owner=user
+        )
+        Food.objects.create(
+            name='Coral Worms', restaurant=restaurant,
+            price=20,
+            image_path='res_owner/images/coral_worm.png'
         )
 
     def test_get_fields(self):
         """
         Check that the model have the specified fields
         """
-        restaurant = Restaurant.objects.get(id=1)
+        food = Food.objects.get(id=1)
         raised = False
         try:
-            restaurant._meta.get_field('name')
-            restaurant._meta.get_field('location')
-            restaurant._meta.get_field('image_path')
-            restaurant._meta.get_field('restaurant_owner')
+            food._meta.get_field('name')
+            food._meta.get_field('restaurant')
+            food._meta.get_field('price')
+            food._meta.get_field('image_path')
         except FieldDoesNotExist:
             raised = True
         self.assertFalse(raised, 'Some fields do not exist')
@@ -102,11 +107,11 @@ class TestFoodModel(TestCase):
         Check to make sure all fields' max lengths values of this model
         are expected to equal specific numbers.
         """
-        restaurant = Restaurant.objects.get(id=1)
-        max_name_length = restaurant._meta.get_field('name').max_length
-        max_location_length = restaurant._meta.get_field('location').max_length
-        max_img_path_length = restaurant._meta.get_field('image_path').max_length
+        food = Food.objects.get(id=1)
+        max_name_length = food._meta.get_field('name').max_length
+        max_price_digits = food._meta.get_field('price').max_digits
+        max_img_path_length = food._meta.get_field('image_path').max_length
         self.assertEqual(max_name_length, 200)
-        self.assertEqual(max_location_length, 200)
+        self.assertEqual(max_price_digits, 12)
         self.assertEqual(max_img_path_length, 100)
 

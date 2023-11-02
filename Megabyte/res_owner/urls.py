@@ -5,7 +5,7 @@ from . import views
 app_name = 'res_owner'
 urlpatterns = [
     # Home_page for res_owner
-    path('res_home_page/<int:user_id>', views.res_home_page, name='res_home_page'),
+    path('res_home_page/', views.res_home_page, name='res_home_page'),
     # Central page for adding/removing or editing restaurants
     path('restaurants_settings', views.res_settings, name='res_settings'),
     # Page for editing an existing restaurant entry
