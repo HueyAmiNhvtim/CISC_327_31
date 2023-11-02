@@ -1,7 +1,9 @@
 # something like
+# We should have make food have a many-to-many relationship to restaurant man...... But that's just a QOL....
 
 # Restaurants shenanigans
-#
+# Test if adding restaurant will make the restaurant appear in the database.
+# Test if removing restaurant will delete that restaurant alongside its associating food in the database
 
 # Food shenanigans
 # Test if pressing delete will delete the actual food off the restaurant

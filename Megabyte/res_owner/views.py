@@ -408,7 +408,7 @@ def delete_food(request, food_id: int):
 @login_required
 def order_management(request):
     """
-    The page for viewing the list of orders.
+    The page for viewing the list of orders for a restaurant.
     :param request: a HttpRequest object specific to Django
     :return the rendering of the HTML page orders.html
     """
