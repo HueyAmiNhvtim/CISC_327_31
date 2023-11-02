@@ -6,6 +6,7 @@ class UserData(models.Model):
     username = models.CharField(max_length=100)
     email = models.EmailField()
     password = models.CharField(max_length=128)
+    cart = models.JSONField(default=list)
 
     def __str__(self):
         """Return the username of the user"""
@@ -13,48 +14,34 @@ class UserData(models.Model):
 
 
 class Quantity(models.Model):
-    """
-    A model representation of the quantity field to add
-    multiple of a type of a food item to a cart
-    """
-    quantity = models.PositiveIntegerField()
+    """A model representation of the amount of an item"""
+    quantity = models.CharField(max_length=4)
 
     def __str__(self):
-        """Return the quantity of the item"""
-        return str(self.quantity)
-
-
-class ShoppingCart(models.Model):
-    """A model representation of the shopping cart"""
-    # 50000 is a placeholder, as max_length is required
-    items = models.CharField(max_length=50000)
-    restaurants = models.CharField(max_length=50000)
-    quantities = models.CharField(max_length=50000)
-    prices = models.CharField(max_length=50000)
-
-    def __str__(self):
-        """Return the item names"""
-        return self.items
+        """Return the quantity"""
+        return self.quantity
 
 
 class Location(models.Model):
     """Model representation of the user's location"""
-    location = models.CharField(max_length=1024)
+    street = models.CharField(max_length=1024)
+    city = models.CharField(max_length=256)
+    province_or_state = models.CharField(max_length=100)
+    country = models.CharField(max_length=100)
+    postal_code = models.CharField(max_length=10)
 
     def __str__(self):
         """Return the address of the user"""
-        return self.location
+        return self.street, self.city, self.province_or_state, self.country, self.postal_code
 
 
 class Order(models.Model):
     """Model representation of an order"""
-    order_id = models.PositiveIntegerField()
+    status = models.TextChoices("status", "Sent Accepted Prepared Delivered")
+    user = models.PositiveIntegerField()
     date_and_time = models.DateTimeField()
-    items = models.CharField(max_length=50000)
-    restaurants = models.CharField(max_length=50000)
-    quantities = models.CharField(max_length=50000)
-    prices = models.CharField(max_length=50000)
+    cart = models.JSONField(default=list)
 
     def __str__(self):
         """Return the order id"""
-        return str(self.order_id)
+        return str(self.date_and_time)

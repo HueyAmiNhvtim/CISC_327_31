@@ -3,19 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Food</title>
+    <title>Edit Quantity</title>
 </head>
 <body>
     {% extends 'user/base.html' %}
     {% block content %}
-    <h1>{{ food.name }}</h1>
-    ${{food.price}}
 
-    <form action="{% url 'user:add_to_shopping_cart' user.id restaurant.id food.id %}" method="post">
+    <form action="{% url 'user:edit_quantity' user.id food.id %}" method="post">
         {% csrf_token %}
         <label>How many would you like to buy?</label>
         {{ form.as_div }}
-        <button name="add_to_cart_button">Add to cart</button>
+        <button name="edit_quantity_button">Save changes</button>
     </form>
 
     {% endblock content %}

@@ -105,10 +105,12 @@ def categorizing(request, category_name: str, restaurant_id: int):
         raise Http404
     if request.method != 'POST':
         # Initial request: Pre-fill form with the current entry
-        form = CategorizingForm(restaurant_id=restaurant_id, instance=this_category)
+        form = CategorizingForm(
+            restaurant_id=restaurant_id, instance=this_category)
     else:
         # POST request type confirmed, process data
-        form = CategorizingForm(data=request.POST, restaurant_id=restaurant_id, instance=this_category)
+        form = CategorizingForm(
+            data=request.POST, restaurant_id=restaurant_id, instance=this_category)
         if form.is_valid():
             form.save()
             if len(form.food_not_in_res) > 0:
@@ -120,7 +122,8 @@ def categorizing(request, category_name: str, restaurant_id: int):
             return redirect('res_owner:res_home_page', user_id=this_restaurant.restaurant_owner.id)
 
     # This sends the context to render the edit_restaurant.html
-    context = {'form': form, 'category_name': category_name, 'restaurant_id': restaurant_id}
+    context = {'form': form, 'category_name': category_name,
+               'restaurant_id': restaurant_id}
     return render(request, 'res_owner/categorizing.html', context)
 
 

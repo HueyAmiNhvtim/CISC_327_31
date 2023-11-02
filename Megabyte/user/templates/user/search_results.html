@@ -11,10 +11,10 @@
     <h1>Search Results</h1>
     <ul>
         <!--List of search results-->
-        {% for result in results%}
+        {% for restaurant in restaurants %}
         <li>
-            <a href="{% url 'user:restaurant' result.id %}">
-              {{ result.name }}  
+            <a href="{% url 'user:restaurant' restaurant.id %}">
+              {{ restaurant.name }}  
             </a>
         </li>
         {% endfor %}
