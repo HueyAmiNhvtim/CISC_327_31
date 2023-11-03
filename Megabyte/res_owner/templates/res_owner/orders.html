@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    {% extends 'registration/base.html' %}
+    {% block content %}
+        <p>All orders <br>
+        <!--Display all orders in the order of their restaurants-->
+        <ul>
+            <!-- restaurants variable is supposed to be part of the context dictionary! -->
+            {% for order in orders %}
+                <li>
+                    <p> Order #{{ order.id }}</p>
+                    <p>{{ order.items }}: {{ order.quantities }}</p>
+                    <p>Total price per order: {{ order.prices }}</p>
+                    <p>Date ordered: {{ order.date_and_time }}</p>
+                    <!-- Order should have a status that is just a char field -->
+                    <p>Status: {{ order.status }}</p>
+                    <form action="{% url 'res_owner:change_status' order.id %}" method="get">
+                        <button name="submit">Change status?</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endblock content %}
+</body>
+</html>

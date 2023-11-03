@@ -42,8 +42,15 @@
                 {% endfor %}
             </select>
         </form>
+        <!--Add new food-->
+        <hr />
+        <form action="{% url 'res_owner:new_food' restaurant_id %}" method="get">
+            <label>Add new food to your restaurant:</label>
+            {% csrf_token %}
+            <button name="new_food_button"> Add Food? </button>
+        </form>
         <form action="{% url 'res_owner:new_category' restaurant.id %}" method="get">
-            <label>Or add a new category here:</label>
+            <label>Or add a new category here: (Add food first tho)</label>
             <button>
                 Add a category?
             </button>

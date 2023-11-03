@@ -8,7 +8,7 @@
 <body>
     {% extends 'registration/base.html' %}
     {% block content %}
-        <form action="{% url 'user:user_settings' %}" method="post">
+        <form action="{% url 'user:user_settings' user.id %}" method="get">
             {% csrf_token %}
             <button name="user_settings_button">User Settings</button>
         </form>
@@ -16,7 +16,11 @@
             {% csrf_token %}
             <button name="search_button">Search</button>
         </form>
-        <form action="{% url 'user:view_orders' %}" method="post">
+        <form action="{% url 'user:shopping_cart' user.id %}" method="post">
+            {% csrf_token %}
+            <button name="search_button">View Shopping Cart</button>
+        </form>
+        <form action="{% url 'user:view_orders' user.id %}" method="post">
             {% csrf_token %}
             <button name="view_orders_button">View Orders</button>
         </form>

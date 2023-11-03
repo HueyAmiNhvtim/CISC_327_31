@@ -1,9 +1,7 @@
 from django import forms
 
 from .models import Restaurant, Food, Category
-
-
-# If custom user.... import customer_user here or sth
+from user.models import Order
 
 
 class RestaurantForm(forms.ModelForm):
@@ -23,7 +21,7 @@ class FoodForm(forms.ModelForm):
         # model!
         fields = ['name', 'price', 'image_path']
 
-
+    
 class CategorizingForm(forms.ModelForm):
     # Potential Issue:
     # Since categories are shared among the restaurants. Multiple ChoiceField limits the amount of food specific
@@ -78,3 +76,9 @@ class NewCategoryForm(forms.ModelForm):
     )
 
 
+# WIP
+# class ChangeOrderStatus(forms.ModelForm):
+#     class Meta:
+#         model = Order
+#         fields = ['status']
+#     pass

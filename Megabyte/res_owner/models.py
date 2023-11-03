@@ -12,7 +12,7 @@ class Restaurant(models.Model):
     Each owner can have multiple restaurants associating with it.
     """
     # I think I should associate user here rather than the res_owner.
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     location = models.CharField(max_length=200)  # May subject to change
     # Path to the image representation of the restaurant
     # Only change to FilePathField when you have the actual locations.
@@ -24,8 +24,6 @@ class Restaurant(models.Model):
     # This will have to be changed once custom User registrations are implemented
     # Delete blank and null once that happens
     restaurant_owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
-
-    # restaurant_owner = models.ForeignKey(RestaurantOwner, on_delete=models.CASCADE)
 
     def __str__(self):
         """Return the name of the restaurant"""

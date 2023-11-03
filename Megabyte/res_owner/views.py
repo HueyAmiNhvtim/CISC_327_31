@@ -3,25 +3,27 @@ from .models import Restaurant, Food, Category
 from .forms import RestaurantForm, FoodForm, CategorizingForm, NewCategoryForm
 
 from accounts.models import CustomUser
+from user.models import Order
+
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 # Create your views here.
 
 
 @login_required
-def res_home_page(request, user_id):
+def res_home_page(request):
     """
     The home page for the restaurant owner
     Show all the categories of a restaurant
     :param request: a HttpRequest object specific to Django
-    :param user_id: the id of the user
     :return the rendering of the html page 'res_owner/res_home_page.html'
     """
-    this_user = CustomUser.objects.get(id=user_id)
-    if this_user != request.user:
+    this_user = CustomUser.objects.get(id=request.user.id)
+    # Make sure non-res-owners can't get access to the restaurant owner page
+    if not this_user.is_res_owner:
         raise Http404
     restaurants = this_user.restaurant_set.all()
-    context = {'user_id': user_id, 'restaurants': restaurants}
+    context = {'restaurants': restaurants}
     return render(request, 'res_owner/res_home_page.html', context)
 
 
@@ -103,10 +105,12 @@ def categorizing(request, category_name: str, restaurant_id: int):
         raise Http404
     if request.method != 'POST':
         # Initial request: Pre-fill form with the current entry
-        form = CategorizingForm(restaurant_id=restaurant_id, instance=this_category)
+        form = CategorizingForm(
+            restaurant_id=restaurant_id, instance=this_category)
     else:
         # POST request type confirmed, process data
-        form = CategorizingForm(data=request.POST, restaurant_id=restaurant_id, instance=this_category)
+        form = CategorizingForm(
+            data=request.POST, restaurant_id=restaurant_id, instance=this_category)
         if form.is_valid():
             form.save()
             if len(form.food_not_in_res) > 0:
@@ -115,10 +119,11 @@ def categorizing(request, category_name: str, restaurant_id: int):
                 for food in form.food_not_in_res:
                     this_category.food.add(food)
                 this_category.save()
-            return redirect('res_owner:res_home_page', user_id=this_restaurant.restaurant_owner.id)
+            return redirect('res_owner:res_home_page')
 
     # This sends the context to render the edit_restaurant.html
-    context = {'form': form, 'category_name': category_name, 'restaurant_id': restaurant_id}
+    context = {'form': form, 'category_name': category_name,
+               'restaurant_id': restaurant_id}
     return render(request, 'res_owner/categorizing.html', context)
 
 
@@ -142,7 +147,7 @@ def new_category(request, restaurant_id: int):
         # POST request type confirmed, process data
         form = NewCategoryForm(data=request.POST, restaurant_id=restaurant_id)
 
-        # Check if there is an error associated with field name in the form.
+        # Check if there is an error associated with field name in the form. Cursed, I know.
         if form.errors.get('name') is not None:
             # When the duplicate key in Category table exists.
             if form.errors['name'].as_data():
@@ -162,7 +167,7 @@ def new_category(request, restaurant_id: int):
                 for food in form.food_not_in_res:
                     this_category.food.add(food)
                 this_category.save()
-            return redirect('res_owner:res_home_page', user_id=this_restaurant.restaurant_owner.id)
+            return redirect('res_owner:res_home_page')
 
     # This sends the context to render the edit_restaurant.html
     context = {'form': form, 'restaurant_id': restaurant_id}
@@ -200,7 +205,7 @@ def delete_category(request, category_name: str, restaurant_id: int):
         # Basically, this means this category is used only by this restaurant. So delete it off the database also
         # if foods_with_same_cat == this_category.food.count():
         #     Category.objects.filter(name=category_name).delete() # DOES NOT WORK FOR NOW...
-    return redirect('res_owner:res_home_page', user_id=this_restaurant.restaurant_owner.id)
+    return redirect('res_owner:res_home_page')
 
 
 @login_required
@@ -272,7 +277,7 @@ def new_restaurant(request):
             new_restaurant = form.save(commit=False)
             new_restaurant.restaurant_owner = request.user
             new_restaurant.save()  # Save to the database
-            return redirect('res_owner:res_home_page', user_id=new_restaurant.restaurant_owner.id)
+            return redirect('res_owner:res_home_page')
     context = {'form': form}
     return render(request, 'res_owner/new_restaurant.html', context)
 
@@ -300,7 +305,7 @@ def edit_restaurant(request, restaurant_id: int):
         # Might have to change it once custom form validation is implemented.
         if form.is_valid():
             form.save()
-            return redirect('res_owner:res_home_page', user_id=this_restaurant.restaurant_owner.id)
+            return redirect('res_owner:res_home_page')
     # This sends the context to render the edit_restaurant.html
     context = {'form': form, 'restaurant': this_restaurant}
     return render(request, 'res_owner/edit_restaurant.html', context)
@@ -320,7 +325,7 @@ def delete_restaurant(request, restaurant_id: int):
         raise Http404
     if request.method == 'POST':
         Restaurant.objects.filter(id=restaurant_id).delete()
-    return redirect('res_owner:res_home_page', user_id=this_restaurant.restaurant_owner.id)
+    return redirect('res_owner:res_home_page')
 
 
 @login_required
@@ -343,11 +348,11 @@ def new_food(request, restaurant_id: int):
         this_restaurant = Restaurant.objects.get(id=restaurant_id)
         # POST request type confirmed; processing data
         form = FoodForm(data=request.POST)
-        if form.is_valid():
+        if form.is_valid() and not this_restaurant.food_set.filter(name=request.POST.get('name')):
             new_food = form.save(commit=False)
             new_food.restaurant = this_restaurant
             new_food.save()  # Save to the database
-            return redirect('res_owner:res_home_page', user_id=this_restaurant.restaurant_owner.id)
+            return redirect('res_owner:res_home_page')
     context = {'form': form, 'restaurant_id': restaurant_id}
     return render(request, 'res_owner/new_food.html', context)
 
@@ -375,8 +380,7 @@ def edit_food(request, food_id: int):
         # Might have to change it once custom form validation is implemented.
         if form.is_valid():
             form.save()
-            return redirect('res_owner:res_home_page',
-                            user_id=this_food.restaurant.restaurant_owner.id)
+            return redirect('res_owner:res_home_page')
     # This sends the context to render the edit_restaurant.html
     context = {'form': form, 'food': this_food}
     return render(request, 'res_owner/edit_food.html', context)
@@ -398,4 +402,47 @@ def delete_food(request, food_id: int):
 
     if request.method == 'POST':
         Food.objects.filter(id=food_id).delete()
-    return redirect('res_owner:res_home_page', user_id=this_restaurant.restaurant_owner.id)
+    return redirect('res_owner:restaurant', restaurant_id=this_restaurant.id)
+
+
+# This might be a bad one....
+# This require order to have a foreign key to the restaurant.
+@login_required
+def order_management(request):
+    """
+    The page for viewing the list of orders for a restaurant.
+    :param request: a HttpRequest object specific to Django
+    :return the rendering of the HTML page orders.html
+    """
+    # Prevent normal user from accessing the restaurant owner pages
+    # Allowing res_owner to delete past order is QOL really....
+    if request.user.is_res_owner is False:
+        raise Http404
+    all_restaurants = request.user.restaurant_set.all()
+    orders = []
+    for a_restaurant in all_restaurants:
+        orders.append(list(a_restaurant.order_set.all()))
+    context = {'orders': orders}
+    return render(request, 'res_owner/orders.html', context)
+
+
+# WIP
+@login_required
+def change_order_status(request, order_id):
+    """
+    The page for changing the status of the order.
+    :param request: a HttpRequest object specific to Django
+    :param order_id: the id of the order in the Order table
+    """
+    this_order = Order.objects.get(id=order_id)
+    # Allow only the owner of this order's restaurant to see the order
+    if this_order.restaurants.restaurant_owner != request.user:
+        raise Http404
+    if request.method != 'POST':
+        pass
+    else:
+        pass
+    # The form should be similar to the radio button except you can only choose one.
+    available_statuses = ["Waiting", "Rejected", "Accepted", "Delivered"]
+    context = {'availabe_statuses': available_statuses}
+    return render(request, 'res_owner/change_order_status.html', context)
