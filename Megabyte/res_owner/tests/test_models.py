@@ -120,3 +120,8 @@ class TestFoodModel(TestCase):
         self.assertEqual(max_name_length, 200)
         self.assertEqual(max_price_digits, 12)
         self.assertEqual(max_img_path_length, 100)
+
+
+class TestCategory(TestCase):
+    pass
+

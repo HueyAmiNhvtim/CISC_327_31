@@ -160,7 +160,9 @@ def new_category(request, restaurant_id: int):
             if len(form.food_not_in_res) > 0:
                 existing_cat_name = form.data['name']
                 this_category = Category.objects.get(name=existing_cat_name)
-                # Readd food from other restaurants to the Category. This is cursed but oh well....
+                # Readd food from other restaurants to the Category.
+                # This is due to the MultipleChoiceField in NewCategory form that can cause foods from other restaurants
+                # to be uncategorized when only foods from this restaurant that can be categorized appears in that field
                 for food in form.food_not_in_res:
                     this_category.food.add(food)
                 this_category.save()

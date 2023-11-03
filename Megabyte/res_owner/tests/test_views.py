@@ -227,3 +227,13 @@ class TestRemovingFood(TestCase):
         self.assertFalse(Food.objects.all())
 
 
+class TestCreateCategory(TestCase):
+    pass
+
+
+class TestDeleteCategory(TestCase):
+    pass
+
+
+class TestCategorize(TestCase):
+    pass

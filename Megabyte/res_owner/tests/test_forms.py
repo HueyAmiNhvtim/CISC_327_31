@@ -113,3 +113,10 @@ class TestAddingFoodForm(TestCase):
         })
         self.assertTrue(form.is_valid())
 
+
+class TestNewCategoryForm(TestCase):
+    pass
+
+
+class TestCategorizingForm(TestCase):
+    pass
