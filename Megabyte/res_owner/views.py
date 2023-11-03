@@ -37,15 +37,10 @@ def restaurant(request, restaurant_id: int):
     :return the rendering of the html page 'res_owner/restaurant.html'
     """
     this_restaurant = Restaurant.objects.get(id=restaurant_id)
-    foods = this_restaurant.food_set.all()
     # Check to make sure different user cannot enter into other users' pages
     if this_restaurant.restaurant_owner != request.user:
         raise Http404
-    # Find all categories in all food of a restaurant.
-    res_category = set()
-    for food in foods:
-        for food_category in food.category_set.all():
-            res_category.add(food_category)
+    res_category = this_restaurant.category_set.all()
     sorted_category = sorted(list(res_category), key=lambda x: x.name)
     # Needs refactoring...also in the restaurant.html too
     context = {
@@ -77,7 +72,7 @@ def category(request, category_name: str, restaurant_id: int):
     for food in all_foods:
         if food.restaurant.name == this_restaurant.name:
             foods.append(food)
-    restaurant_name = foods[0].restaurant.name
+    restaurant_name = this_restaurant.name
     sorted_food = sorted(foods, key=lambda a: a.name)
     context = {
         'foods': sorted_food,
@@ -158,12 +153,14 @@ def new_category(request, restaurant_id: int):
                     restaurant_id=restaurant_id,
                     instance=this_category
                 )
-
         if form.is_valid():
-            form.save()
+            new_category = form.save(commit=False)
+            new_category.restaurant.add(this_restaurant)
+            new_category.save()
             if len(form.food_not_in_res) > 0:
                 existing_cat_name = form.data['name']
                 this_category = Category.objects.get(name=existing_cat_name)
+                # Readd food from other restaurants to the Category. This is cursed but oh well....
                 for food in form.food_not_in_res:
                     this_category.food.add(food)
                 this_category.save()
@@ -197,9 +194,12 @@ def delete_category(request, category_name: str, restaurant_id: int):
         foods_with_same_cat = 0
         for food in foods:
             for food_category in food.category_set.all():
+                # Remove every food associated with this category in this restaurant when deleting the category
                 if food_category.name == category_name:
                     this_category.food.remove(food)
                     foods_with_same_cat += 1
+        # Remove the restaurant associating with this category too
+        this_category.restaurant.remove(this_restaurant)
         # print(this_category.food.all())
         # print(foods_with_same_cat)
         # Basically, this means this category is used only by this restaurant. So delete it off the database also

@@ -59,6 +59,7 @@ class Category(models.Model):
     name = models.CharField(max_length=200, primary_key=True)
     food = models.ManyToManyField(Food)
     # When restaurant_owner is going to assign category to food, the decision above makes sense
+    restaurant = models.ManyToManyField(Restaurant)
 
     class Meta:
         """Holds extra information for managing a model"""

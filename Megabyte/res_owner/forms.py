@@ -73,6 +73,7 @@ class NewCategoryForm(forms.ModelForm):
     food = forms.ModelMultipleChoiceField(
         queryset=None,
         widget=forms.CheckboxSelectMultiple,
+        required=False
     )
 
 
