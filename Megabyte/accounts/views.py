@@ -37,7 +37,7 @@ def register(request):
             login(request, new_user)  # Might have to be changed since we're using
             # custom User class
             if new_user.is_res_owner is True:
-                return redirect('res_owner:res_home_page', user_id=new_user.id)
+                return redirect('res_owner:res_home_page')
             else:
                 return redirect('user:user_home_page')
     context = {'form': form}
@@ -64,7 +64,7 @@ def edit_user(request):
             # if is_res_owner, send straight to restaurant_owner home page
             # if user, send to the user equivalent.
             if request.user.is_res_owner is True:
-                return redirect('res_owner:res_home_page', user_id=request.user.id)
+                return redirect('res_owner:res_home_page')
             else:
                 return redirect('user:user_home_page')
     context = {'form': form}

@@ -141,7 +141,6 @@ def new_category(request, restaurant_id: int):
     else:
         # POST request type confirmed, process data
         form = NewCategoryForm(data=request.POST, restaurant_id=restaurant_id)
-
         # Check if there is an error associated with field name in the form. Cursed, I know.
         if form.errors.get('name') is not None:
             # When the duplicate key in Category table exists.
@@ -154,9 +153,11 @@ def new_category(request, restaurant_id: int):
                     instance=this_category
                 )
         if form.is_valid():
+            # Save first then add later
             new_category = form.save(commit=False)
-            new_category.restaurant.add(this_restaurant)
             new_category.save()
+            new_category.restaurant.add(this_restaurant)
+
             if len(form.food_not_in_res) > 0:
                 existing_cat_name = form.data['name']
                 this_category = Category.objects.get(name=existing_cat_name)
@@ -167,8 +168,7 @@ def new_category(request, restaurant_id: int):
                     this_category.food.add(food)
                 this_category.save()
             return redirect('res_owner:res_home_page')
-
-    # This sends the context to render the edit_restaurant.html
+        # This sends the context to render the edit_restaurant.html
     context = {'form': form, 'restaurant_id': restaurant_id}
     return render(request, 'res_owner/new_category.html', context)
 

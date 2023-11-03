@@ -23,6 +23,9 @@ class FoodForm(forms.ModelForm):
 
     
 class CategorizingForm(forms.ModelForm):
+    """
+    Form allows for assignment of food items within a restaurant to a chosen Category
+    """
     # Potential Issue:
     # Since categories are shared among the restaurants. Multiple ChoiceField limits the amount of food specific
     # to that restaurant.... And it will only accidentally remove the food associating with the category from other
@@ -34,6 +37,7 @@ class CategorizingForm(forms.ModelForm):
         self.fields['food'].queryset = Food.objects.filter(restaurant=self.this_restaurant)
         self.food_not_in_res = []
         # For getting food not in this restaurant but is associated with the category
+        # This is to deal with that bug mentioned in Potential Issue
         if kwargs.get("instance"):
             self.existing_category = kwargs.pop('instance')
             for food in self.existing_category.food.all():
@@ -51,6 +55,9 @@ class CategorizingForm(forms.ModelForm):
 
 
 class NewCategoryForm(forms.ModelForm):
+    """
+    Form allows for creation of new Category
+    """
     def __init__(self, *args, **kwargs):
         self.restaurant_id = kwargs.pop('restaurant_id')
         super(NewCategoryForm, self).__init__(*args, **kwargs)
