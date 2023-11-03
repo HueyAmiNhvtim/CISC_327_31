@@ -13,7 +13,7 @@
             <!--List of food-->
             {% for food in food_items %}
             <li>
-                <!--<a href="% url 'user:food' 'restaurant' restaurant_id category_name food.name %">-->
+                
                 <a href="{% url 'user:food' restaurant_id category_name food.name%}">
                 {{ food.name }}  ${{ food.price }}
                 <br>

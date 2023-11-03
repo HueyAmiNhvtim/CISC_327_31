@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Location, UserData, Quantity, Order
+from .models import Location, Quantity, Order
 
 
 class SearchForm(forms.ModelForm):
@@ -20,18 +20,6 @@ class CartForm(forms.ModelForm):
         # Fields you wish to be able to edit must match the fields variables
         # in the corresponding model!
         fields = ['quantity']
-
-
-class UserDataForm(forms.ModelForm):
-    class Meta:
-        # Tell Django to base this form off the UserData model fields
-        model = UserData
-        # Fields you wish to be able to edit must match the fields variables
-        # in the corresponding model!
-        fields = ['username', 'email', 'password']
-        widgets = {
-            'password': forms.PasswordInput()
-        }
 
 
 class OrderForm(forms.ModelForm):

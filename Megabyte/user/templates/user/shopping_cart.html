@@ -21,18 +21,18 @@
                 <br>
                 Quantity: {{ food.3 }}
             </li>
-            <form action="{% url 'user:edit_quantity' user.id food.4 %}" method="get">
+            <form action="{% url 'user:edit_quantity' food.4 %}" method="get">
                 {% csrf_token %}
                 <button name="edit_button">Edit</button>
             </form>
-            <form action="{% url 'user:remove_food' user.id food.4 %}" method="post">
+            <form action="{% url 'user:remove_food' food.4 %}" method="post">
                 {% csrf_token %}
                 <button name="remove_food_button">Remove</button>
             </form>
             <br>
         {% endfor %}
     </ul>
-    <form action="{% url 'user:checkout' user.id %}" method="post">
+    <form action="{% url 'user:checkout' %}" method="post">
         {% csrf_token %}
         <button name="checkout_button">Checkout</button>
     </form>

@@ -33,7 +33,6 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 # Application definition
 
 INSTALLED_APPS = [
-    # 'user.apps.UserConfig',
     # Our apps
     'accounts',
     'res_owner',
@@ -131,5 +130,6 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # OUR SETTINGS
-LOGIN_REDIRECT_URL = 'accounts:home_page'  # Redirect to the url after a successful login attempt
+# Redirect to the url after a successful login attempt
+LOGIN_REDIRECT_URL = 'accounts:home_page'
 LOGOUT_REDIRECT_URL = 'accounts:ellis'

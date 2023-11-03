@@ -1,16 +1,7 @@
 from django.db import models
+from django.conf import settings
 
-
-class UserData(models.Model):
-    """A model representation of a user"""
-    username = models.CharField(max_length=100)
-    email = models.EmailField()
-    password = models.CharField(max_length=128)
-    cart = models.JSONField(default=list)
-
-    def __str__(self):
-        """Return the username of the user"""
-        return self.username
+User = settings.AUTH_USER_MODEL
 
 
 class Quantity(models.Model):
@@ -37,8 +28,8 @@ class Location(models.Model):
 
 class Order(models.Model):
     """Model representation of an order"""
-    status = models.TextChoices("status", "Sent Accepted Prepared Delivered")
     user = models.PositiveIntegerField()
+    status = models.TextChoices("status", "Sent Accepted Prepared Delivered")
     date_and_time = models.DateTimeField()
     cart = models.JSONField(default=list)
 
