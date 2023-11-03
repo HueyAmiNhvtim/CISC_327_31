@@ -264,6 +264,10 @@ def remove_food(request, food_id: int):
 
 @login_required
 def checkout(request):
+    """
+    The page to check out all items in the user's shopping cart
+    :param request: a Request object specific to Django
+    """
     this_user = CustomUser.objects.get(id=request.user.id)
     # Make sure only the user requesting changes can access page
     if this_user != request.user:
