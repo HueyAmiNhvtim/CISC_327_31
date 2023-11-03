@@ -348,7 +348,7 @@ def new_food(request, restaurant_id: int):
         this_restaurant = Restaurant.objects.get(id=restaurant_id)
         # POST request type confirmed; processing data
         form = FoodForm(data=request.POST)
-        if form.is_valid():
+        if form.is_valid() and not this_restaurant.food_set.filter(name=request.POST.get('name')):
             new_food = form.save(commit=False)
             new_food.restaurant = this_restaurant
             new_food.save()  # Save to the database
@@ -402,7 +402,7 @@ def delete_food(request, food_id: int):
 
     if request.method == 'POST':
         Food.objects.filter(id=food_id).delete()
-    return redirect('res_owner:res_home_page')
+    return redirect('res_owner:restaurant', restaurant_id=this_restaurant.id)
 
 
 # This might be a bad one....

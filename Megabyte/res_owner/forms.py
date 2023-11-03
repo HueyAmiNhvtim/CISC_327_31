@@ -21,7 +21,7 @@ class FoodForm(forms.ModelForm):
         # model!
         fields = ['name', 'price', 'image_path']
 
-
+    
 class CategorizingForm(forms.ModelForm):
     # Potential Issue:
     # Since categories are shared among the restaurants. Multiple ChoiceField limits the amount of food specific

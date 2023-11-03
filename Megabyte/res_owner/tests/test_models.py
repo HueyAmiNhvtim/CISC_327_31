@@ -17,21 +17,20 @@ from res_owner.models import Restaurant, Food, Category
 # python3 manage.py test --verbosity 2
 # python3 manage.py test --parallel auto if tests are independent...
 class TestRestaurantModel(TestCase):
-    @classmethod
-    def setUpTestData(cls):
+    def setUp(self):
         """
         Run once to set up non-modified data for all class methods
         """
         User = get_user_model()
-        user = User.objects.create_user(email='iguanasalt@gmail.com',
+        self.user = User.objects.create_user(email='iguanasalt@gmail.com',
                                         username='iguazu', is_res_owner=True,
                                         password='foo')
         # Create the restaurant object for testing.
         # user testing will run its own testing
-        Restaurant.objects.create(
+        self.restaurant = Restaurant.objects.create(
             name='Almond', location='Rubicon-231',
             image_path='res_owner/images/rubicon-231.png',
-            restaurant_owner=user
+            restaurant_owner=self.user
         )
         # Create a food object
 
@@ -39,50 +38,53 @@ class TestRestaurantModel(TestCase):
         """
         Check that the model have the specified fields
         """
-        restaurant = Restaurant.objects.get(id=1)
         raised = False
         try:
-            restaurant._meta.get_field('name')
-            restaurant._meta.get_field('location')
-            restaurant._meta.get_field('image_path')
-            restaurant._meta.get_field('restaurant_owner')
+            self.restaurant._meta.get_field('name')
+            self.restaurant._meta.get_field('location')
+            self.restaurant._meta.get_field('image_path')
+            self.restaurant._meta.get_field('restaurant_owner')
         except FieldDoesNotExist:
             raised = True
         self.assertFalse(raised, 'Some fields do not exist')
+
+    def test_foreign_key(self):
+        """
+        Check that the model have the specified foreign key
+        """
+        self.assertEqual(self.restaurant.restaurant_owner.username, "iguazu")
 
     def test_max_length_of_fields(self):
         """
         Check to make sure all fields' max lengths values of this model
         are expected to equal specific numbers.
         """
-        restaurant = Restaurant.objects.get(id=1)
-        max_name_length = restaurant._meta.get_field('name').max_length
-        max_location_length = restaurant._meta.get_field('location').max_length
-        max_img_path_length = restaurant._meta.get_field('image_path').max_length
+        max_name_length = self.restaurant._meta.get_field('name').max_length
+        max_location_length = self.restaurant._meta.get_field('location').max_length
+        max_img_path_length = self.restaurant._meta.get_field('image_path').max_length
         self.assertEqual(max_name_length, 200)
         self.assertEqual(max_location_length, 200)
         self.assertEqual(max_img_path_length, 100)
 
 
 class TestFoodModel(TestCase):
-    @classmethod
-    def setUpTestData(cls):
+    def setUp(self):
         """
         Run once to set up non-modified data for all class methods
         """
-        User = get_user_model()
-        user = User.objects.create_user(email='iguanasalt@gmail.com',
-                                        username='iguazu', is_res_owner=True,
-                                        password='foo')
+        self.User = get_user_model()
+        self.user = self.User.objects.create_user(email='iguanasalt@gmail.com',
+                                                  username='iguazu', is_res_owner=True,
+                                                  password='foo')
         # Create the restaurant object for testing.
         # user testing will run its own testing
-        restaurant = Restaurant.objects.create(
+        self.restaurant = Restaurant.objects.create(
             name='Almondo', location='Rubicon-231',
             image_path='res_owner/images/rubicon-231.png',
-            restaurant_owner=user
+            restaurant_owner=self.user
         )
-        Food.objects.create(
-            name='Coral Worms', restaurant=restaurant,
+        self.food = Food.objects.create(
+            name='Coral Worms', restaurant=self.restaurant,
             price=20,
             image_path='res_owner/images/coral_worm.png'
         )
@@ -91,27 +93,30 @@ class TestFoodModel(TestCase):
         """
         Check that the model have the specified fields
         """
-        food = Food.objects.get(id=1)
         raised = False
         try:
-            food._meta.get_field('name')
-            food._meta.get_field('restaurant')
-            food._meta.get_field('price')
-            food._meta.get_field('image_path')
+            self.food._meta.get_field('name')
+            self.food._meta.get_field('restaurant')
+            self.food._meta.get_field('price')
+            self.food._meta.get_field('image_path')
         except FieldDoesNotExist:
             raised = True
         self.assertFalse(raised, 'Some fields do not exist')
 
+    def test_foreign_key(self):
+        """
+        Check that the model have the specified foreign key
+        """
+        self.assertEqual(self.food.restaurant.name, "Almondo")
+
     def test_max_length_of_fields(self):
         """
-        Check to make sure all fields' max lengths values of this model
-        are expected to equal specific numbers.
+            Check to make sure all fields' max lengths values of this model
+            are expected to equal specific numbers.
         """
-        food = Food.objects.get(id=1)
-        max_name_length = food._meta.get_field('name').max_length
-        max_price_digits = food._meta.get_field('price').max_digits
-        max_img_path_length = food._meta.get_field('image_path').max_length
+        max_name_length = self.food._meta.get_field('name').max_length
+        max_price_digits = self.food._meta.get_field('price').max_digits
+        max_img_path_length = self.food._meta.get_field('image_path').max_length
         self.assertEqual(max_name_length, 200)
         self.assertEqual(max_price_digits, 12)
         self.assertEqual(max_img_path_length, 100)
-
