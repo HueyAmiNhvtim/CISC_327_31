@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.core.exceptions import *
+from django.db.utils import IntegrityError
 from res_owner.models import Restaurant, Food, Category
 
 
@@ -48,7 +49,7 @@ class TestRestaurantModel(TestCase):
             raised = True
         self.assertFalse(raised, 'Some fields do not exist')
 
-    def test_foreign_key(self):
+    def test_foreign_key_user(self):
         """
         Check that the model have the specified foreign key
         """
@@ -65,6 +66,30 @@ class TestRestaurantModel(TestCase):
         self.assertEqual(max_name_length, 200)
         self.assertEqual(max_location_length, 200)
         self.assertEqual(max_img_path_length, 100)
+
+    def test_unique_name(self):
+        """
+        Check that restaurant's name field is unique
+        """
+        self.raised = False
+        try:
+            Restaurant.objects.create(
+                name='Almond', location='Earth-231',
+                image_path='res_owner/images/Earth-231.png',
+                restaurant_owner=self.user
+            )
+        except IntegrityError:
+            self.raised = True
+        self.assertTrue(self.raised)
+
+    def test_delete(self):
+        """
+        Check to make sure that when the User is deleted, the restaurant associated with the User is also deleted as well
+        """
+        res_name = self.restaurant.name
+        self.user.delete()
+        # Assert that the restaurant got obliterated off the database
+        self.assertFalse(Restaurant.objects.filter(name=res_name))
 
 
 class TestFoodModel(TestCase):
@@ -103,7 +128,7 @@ class TestFoodModel(TestCase):
             raised = True
         self.assertFalse(raised, 'Some fields do not exist')
 
-    def test_foreign_key(self):
+    def test_foreign_key_restaurant(self):
         """
         Check that the model have the specified foreign key
         """
@@ -121,7 +146,111 @@ class TestFoodModel(TestCase):
         self.assertEqual(max_price_digits, 12)
         self.assertEqual(max_img_path_length, 100)
 
+    def test_delete(self):
+        """
+        Check to make sure that when the Restaurant is deleted, the food associated with the restaurant is also deleted as well
+        """
+        food_name = self.food.name
+        self.restaurant.delete()
+        # Assert that the restaurant got obliterated off the database
+        self.assertFalse(Food.objects.filter(name=food_name))
+
 
 class TestCategory(TestCase):
-    pass
+    def setUp(self):
+        """
+        Run once to set up non-modified data for all class methods
+        """
+        self.User = get_user_model()
+        self.user = self.User.objects.create_user(email='iguanasalt@gmail.com',
+                                                  username='iguazu', is_res_owner=True,
+                                                  password='foo')
+
+        self.restaurant_1 = Restaurant.objects.create(
+            name='Almondo', location='Rubicon-231',
+            image_path='res_owner/images/rubicon-231.png',
+            restaurant_owner=self.user
+        )
+        self.restaurant_2 = Restaurant.objects.create(
+            name='Static Noise', location='Rubicon-231',
+            image_path='res_owner/images/static-231.png',
+            restaurant_owner=self.user
+        )
+
+        self.food_1 = Food.objects.create(
+            name='Coral Worms', restaurant=self.restaurant_1,
+            price=20,
+            image_path='res_owner/images/coral_worm.png'
+        )
+        self.food_2 = Food.objects.create(
+            name='Worms Sushi BAWS special', restaurant=self.restaurant_2,
+            price=30,
+            image_path='res_owner/images/coral_worm.png'
+        )
+
+        self.category = Category.objects.create(
+            name='Worms',
+        )
+        self.category.food.add(self.food_1, self.food_2)
+        self.category.restaurant.add(self.restaurant_1, self.restaurant_2)
+
+    def test_get_fields(self):
+        """
+        Check that the model have the specified fields
+        """
+        raised = False
+        try:
+            self.category._meta.get_field('name')
+            self.category._meta.get_field('restaurant')
+            self.category._meta.get_field('food')
+        except FieldDoesNotExist:
+            raised = True
+        self.assertFalse(raised, 'Some fields do not exist')
+
+    def test_foreign_key_restaurant(self):
+        """
+        Check that the model have the specified key and that key represents the Many-to-Many field
+        """
+        self.assertTrue(self.category.restaurant.filter(name=self.restaurant_1.name) and
+                        self.category.restaurant.get(name=self.restaurant_2.name))
+
+    def test_foreign_key_food(self):
+        """
+        Check that the model have the specified key and that key represents the Many-to-Many field
+        """
+        self.assertTrue(self.category.food.filter(name=self.food_1.name) and
+                        self.category.food.filter(name=self.food_2.name))
+
+    def test_max_length_of_fields(self):
+        """
+            Check to make sure all fields' max lengths values of this model
+            are expected to equal specific numbers.
+        """
+        max_name_length = self.category._meta.get_field('name').max_length
+        self.assertEqual(max_name_length, 200)
+
+    def test_unique_name(self):
+        """
+        Check that category's name field is unique
+        """
+        self.raised = False
+        try:
+            Category.objects.create(name='Worms')
+        except IntegrityError:
+            self.raised = True
+        self.assertTrue(self.raised)
+
+    def test_delete(self):
+        """
+        Check to make sure that when the category is deleted, nothing associated with it is also accidentally deleted
+        """
+        self.category.delete()
+        # Assert no restaurants got obliterated off the database
+        self.assertTrue(Restaurant.objects.filter(name=self.restaurant_1.name) and
+                        Restaurant.objects.filter(name=self.restaurant_2.name))
+        # Assert no food got obliterated off the database
+        self.assertTrue(Food.objects.filter(name=self.food_1.name) and
+                        Food.objects.filter(name=self.food_2.name))
+
+
 

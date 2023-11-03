@@ -69,12 +69,6 @@ class Category(models.Model):
         """Return the name of the category"""
         return self.name
 
-    def __eq__(self, other):
-        """Return a boolean if objects have same name"""
-        if type(other) != Category:
-            return False
-        return other.name == self.name
-
     def __hash__(self):
         """For equality comparison"""
         return hash(self.name)
