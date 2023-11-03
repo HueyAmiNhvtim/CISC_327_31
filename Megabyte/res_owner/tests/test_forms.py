@@ -131,7 +131,7 @@ class TestNewCategoryForm(TestCase):
             image_path='res_owner/images/rubicon-231.png',
             restaurant_owner=self.user
         )
-        self.food = Food.objects.create(
+        self.food_1 = Food.objects.create(
             name='Coral Worms', restaurant=self.restaurant,
             price=20,
             image_path='res_owner/images/coral_worm.png'
@@ -142,15 +142,12 @@ class TestNewCategoryForm(TestCase):
             image_path='res_owner/images/coral_worm.png'
         )
         self.client.login(email='iguanasalt@gmail.com', password='foo')
-        # self.res_hp_view_func = reverse(viewname='res_owner:res_home_page')
-        # self.new_res_view_func = reverse(viewname='res_owner:new_restaurant')
-        self.new_cat_view_func = reverse(viewname='res_owner:new_category', args=[self.restaurant.id])
 
     def test_NewCategoryForm_valid_data(self):
         """Test if CategoryForm accept specified valid data"""
         form = NewCategoryForm(restaurant_id=self.restaurant.id, data={
             'name': 'Snail',
-            'food': [self.food, self.food_2]  # It accepts a list
+            'food': [self.food_1, self.food_2]  # It accepts a list
         })
         self.assertTrue(form.is_valid())
 
@@ -173,12 +170,12 @@ class TestNewCategoryForm(TestCase):
         # Create an existing category
         form = NewCategoryForm(restaurant_id=self.restaurant.id, data={
             'name': 'Snail',
-            'food': [self.food]
+            'food': [self.food_1]
         })
         form.save()
         new_form = NewCategoryForm(restaurant_id=self.restaurant.id, data={
             'name': 'Snail',
-            'food': [self.food, self.food_2]
+            'food': [self.food_1, self.food_2]
         })
         self.assertFalse(new_form.is_valid())
 

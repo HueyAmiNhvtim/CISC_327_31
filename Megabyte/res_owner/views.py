@@ -109,7 +109,7 @@ def categorizing(request, category_name: str, restaurant_id: int):
         if form.is_valid():
             form.save()
             if len(form.food_not_in_res) > 0:
-                existing_cat_name = form.data['name']
+                existing_cat_name = this_category.name
                 this_category = Category.objects.get(name=existing_cat_name)
                 for food in form.food_not_in_res:
                     this_category.food.add(food)
@@ -157,7 +157,6 @@ def new_category(request, restaurant_id: int):
             new_category = form.save(commit=False)
             new_category.save()
             new_category.restaurant.add(this_restaurant)
-
             if len(form.food_not_in_res) > 0:
                 existing_cat_name = form.data['name']
                 this_category = Category.objects.get(name=existing_cat_name)

@@ -53,7 +53,7 @@ class TestRestaurantOwnerHomePageViews(TestCase):
 
     def test_restaurants_home_page_GET(self):
         """
-        Test that the page res_home_page.html accepts the requests and render the correct html page
+        Test that the view function res_home_page accepts the requests and render the correct html page
         """
         response = self.client.get(self.res_hp_view_func)
         # Assert that the request is successful
@@ -63,7 +63,7 @@ class TestRestaurantOwnerHomePageViews(TestCase):
 
     def test_restaurants_home_page_restaurant(self):
         """
-        Test that the view function renders the res_home_page.html with the context of restaurant
+        Test that the view function's context includes the list of restaurants if user has any.
         """
         response = self.client.get(self.res_hp_view_func)
         restaurant = Restaurant.objects.get(name='Almond')
@@ -89,7 +89,7 @@ class TestAddingARestaurant(TestCase):
 
     def test_adding_a_restaurant_GET(self):
         """
-        Test that the page new_restaurant.html accepts the GET request and render the correct html page
+        Test that the view function new_restaurant accepts the GET request and render the correct html page
         """
         response = self.client.get(self.new_res_view_func)
         # Assert that the request is successful
@@ -99,7 +99,7 @@ class TestAddingARestaurant(TestCase):
 
     def test_adding_a_restaurant_POST_success(self):
         """
-        Test that the page new_restaurant.html accepts the registration a restaurant with valid data
+        Test that the view function new_restaurant accepts the registration of a restaurant with valid data
         """
         response = self.client.post(self.new_res_view_func, {
             'name': 'Almond',
@@ -141,7 +141,7 @@ class TestAddingFood(TestCase):
 
     def test_adding_food_GET(self):
         """
-        Test that the page new_food.html accepts the GET requests and render the correct html page
+        Test that the view function new_food accepts the GET requests and render the correct html page
         """
         response = self.client.get(self.new_food_func)
         # Assert that the request is successful
@@ -151,7 +151,7 @@ class TestAddingFood(TestCase):
 
     def test_adding_food_POST_success(self):
         """
-        Test that the page new_food.html accepts the registration a restaurant with valid data
+        Test that the view function new_food.html accepts the registration of a restaurant with valid data
         """
         response = self.client.post(self.new_food_func, {
             'name': 'Almond Milk',
@@ -228,7 +228,72 @@ class TestRemovingFood(TestCase):
 
 
 class TestCreateCategory(TestCase):
-    pass
+    def setUp(self):
+        """
+        Run once to set up non-modified data for all class methods
+        """
+        self.client = Client()
+        self.User = get_user_model()
+        self.user = self.User.objects.create_user(email='iguanasalt@gmail.com',
+                                                  username='iguazu', is_res_owner=True,
+                                                  password='foo')
+        self.client.login(email='iguanasalt@gmail.com', password='foo')
+        self.restaurant = Restaurant.objects.create(
+            name='Almond', location='Rubicon-231',
+            image_path='res_owner/images/rubicon-231.png',
+            restaurant_owner=self.user
+        )
+        self.food_one = Food.objects.create(
+            name='Coral Worms', restaurant=self.restaurant,
+            price=20,
+            image_path='res_owner/images/coral_worm.png'
+        )
+        self.food_two = Food.objects.create(
+            name='Worms Sushi BAWS special', restaurant=self.restaurant,
+            price=30,
+            image_path='res_owner/images/coral_worm.png'
+        )
+        self.res_hp_view_func = reverse(viewname='res_owner:res_home_page')
+        self.new_cat_view_func = reverse(viewname='res_owner:new_category', args=[self.restaurant.id])
+
+    def test_adding_a_category_GET(self):
+        """
+        Test that the view function new_category accepts the GET request and render the correct html page
+        """
+        response = self.client.get(self.new_cat_view_func)
+        # Assert that the request is successful
+        self.assertEquals(response.status_code, 200)
+        # Assert that the correct html page is used
+        self.assertTemplateUsed(response, 'res_owner/new_category.html')
+
+    def test_adding_a_category_POST_success(self):
+        """
+        Test that the view function new_category accepts a successful POST request and does redirect
+        """
+        # When do client posting this time, the food has to be a list of food.id for MultipleChoiceField
+        form_data = {
+            'name': 'Snail',
+            'food': [self.food_one.id, self.food_two.id],  # ID this time for MultipleChoiceField
+        }
+
+        response = self.client.post(self.new_cat_view_func, data=form_data)
+        # Assert that upon a successful completion of the code, the page is redirected to the homepage
+        self.assertRedirects(response, self.res_hp_view_func, status_code=302)
+        # Assert that there is a Category created
+        self.assertTrue(Category.objects.filter(name='Snail'))
+        # Assert the restaurant and the food is associated with it
+        self.assertTrue(self.restaurant.category_set.filter(name='Snail'))
+        self.assertTrue(Category.objects.filter(name='Snail'))
+        # Somehow the test doesn't work with ModelMultipleChoiceField
+        self.assertTrue(self.food_one.category_set.filter(name='Snail'))
+        self.assertTrue(self.food_two.category_set.filter(name='Snail'))
+
+
+        # self.assertTrue()
+
+    # No testing duplicate that violates the unique key constraint.
+    # since self.client.post basically bypassed through the forms.is_valid()
+    # That should be the responsibility of the forms.is_valid() methinks
 
 
 class TestDeleteCategory(TestCase):

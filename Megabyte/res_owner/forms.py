@@ -63,7 +63,7 @@ class NewCategoryForm(forms.ModelForm):
         super(NewCategoryForm, self).__init__(*args, **kwargs)
         self.this_restaurant = Restaurant.objects.get(id=self.restaurant_id)
         self.fields['food'].queryset = Food.objects.filter(restaurant=self.this_restaurant)
-
+        print(self.fields['food'].choices)
         self.food_not_in_res = []
         # For getting food not in this restaurant but is associated with the category
         if kwargs.get("instance"):
