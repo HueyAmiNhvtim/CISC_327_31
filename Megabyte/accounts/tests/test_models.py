@@ -2,6 +2,7 @@ from django.test import TestCase
 from accounts.models import CustomUser
 from django.contrib.auth import get_user_model
 
+
 class CustomUserModelTest(TestCase):
     def test_create_user(self):
         user = CustomUser.objects.create_user(

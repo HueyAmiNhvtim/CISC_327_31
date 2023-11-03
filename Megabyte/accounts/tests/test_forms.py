@@ -2,6 +2,7 @@ from django.test import TestCase
 from accounts.forms import CustomUserCreationForm, CustomUserChangeForm
 from django.contrib.auth import get_user_model
 
+
 class CustomUserCreationFormTest(TestCase):
     def test_custom_user_creation_form_valid_data(self):
         form = CustomUserCreationForm(data={
@@ -17,6 +18,7 @@ class CustomUserCreationFormTest(TestCase):
         form = CustomUserCreationForm(data={})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 4)
+
 
 class CustomUserChangeFormTest(TestCase):
     def test_custom_user_change_form_valid_data(self):
