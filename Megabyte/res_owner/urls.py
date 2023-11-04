@@ -4,8 +4,8 @@ from . import views
 
 app_name = 'res_owner'
 urlpatterns = [
-    # Home_page for restaurant owners
-    path('', views.res_home_page, name='res_home_page'),
+    # Home_page for res_owner
+    path('res_home_page/', views.res_home_page, name='res_home_page'),
     # Central page for adding/removing or editing restaurants
     path('restaurants_settings', views.res_settings, name='res_settings'),
     # Page for editing an existing restaurant entry
@@ -14,7 +14,10 @@ urlpatterns = [
     path('new_restaurant', views.new_restaurant, name='new_restaurant'),
     # Page for deleting the restaurant entry
     path('remove_restaurant/<int:restaurant_id>', views.delete_restaurant, name='delete_restaurant'),
-
+    # Page for viewing orders by the users
+    path('orders/', views.order_management, name='order_management'),
+    # Page for changing the status of each order
+    path('order/<int:order_id>', views.change_order_status, name='order_change_status'),
     # Page for each restaurant
     path('restaurants/<int:restaurant_id>/', views.restaurant, name='restaurant'),
     # Page for deleting the category, well, not completely deleting off the database of course.

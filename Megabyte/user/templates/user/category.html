@@ -8,14 +8,15 @@
 <body>
     {% extends 'user/base.html' %}
     {% block content %}
-    <h1>Category</h1>
+    <p>Viewing {{ category_name }} in {{ restaurant_name }}</p>
         <ul>
             <!--List of food-->
-            {% for food in food_items%}
+            {% for food in food_items %}
             <li>
-                <a href="{% url 'user:food' food.name %}">
+                
+                <a href="{% url 'user:food' restaurant_id category_name food.name%}">
                 {{ food.name }}  ${{ food.price }}
-                <br />
+                <br>
                 <img src={{food.image_path}}>
                 </a>
             </li>

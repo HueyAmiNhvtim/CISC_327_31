@@ -9,6 +9,34 @@
     {% extends 'user/base.html' %}
     {% block content %}
     <h1>Shopping Cart</h1>
+    <ul>
+        <!--List of items in shopping cart-->
+        {% for food in user.cart %}
+            <li>
+                Item: {{ food.0 }} 
+                <br>
+                Restaurant: {{ food.1 }}
+                <br>
+                Price per item: ${{ food.2 }}
+                <br>
+                Quantity: {{ food.3 }}
+            </li>
+            <form action="{% url 'user:edit_quantity' food.4 %}" method="get">
+                {% csrf_token %}
+                <button name="edit_button">Edit</button>
+            </form>
+            <form action="{% url 'user:remove_food' food.4 %}" method="post">
+                {% csrf_token %}
+                <button name="remove_food_button">Remove</button>
+            </form>
+            <br>
+        {% endfor %}
+    </ul>
+    <form action="{% url 'user:checkout' %}" method="post">
+        {% csrf_token %}
+        <button name="checkout_button">Checkout</button>
+    </form>
+
     {% endblock content %}
 </body>
 </html>

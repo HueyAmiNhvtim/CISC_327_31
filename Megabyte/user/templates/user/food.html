@@ -8,13 +8,13 @@
 <body>
     {% extends 'user/base.html' %}
     {% block content %}
-    <h1>Food</h1>
-    {{ food.name }}  {{food.price}}
+    <h1>{{ food.name }}</h1>
+    ${{food.price}}
 
-    <form action="{% url 'user:shopping_cart' %}" method="post">
+    <form action="{% url 'user:add_to_shopping_cart' restaurant.id category_name food.id %}" method="post">
         {% csrf_token %}
         <label>How many would you like to buy?</label>
-        <input type="number">
+        {{ form.as_div }}
         <button name="add_to_cart_button">Add to cart</button>
     </form>
 

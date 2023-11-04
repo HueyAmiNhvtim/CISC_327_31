@@ -5,7 +5,7 @@
     <title>Title</title>
 </head>
 <body>
-    {% extends 'res_owner/base.html' %}
+    {% extends 'registration/base.html' %}
     {% block content %}
         <p>Restaurant: {{ restaurant_name }} <br>
             All foods associating with category {{ category_name }} </p>
@@ -29,12 +29,6 @@
         </ul>
     {% endblock content %}
     {% block settings %}
-        <!--Add new food-->
-        <hr />
-        <form action="{% url 'res_owner:new_food' restaurant_id %}" method="get">
-            {% csrf_token %}
-            <button name="new_food_button"> Add Food? </button>
-        </form>
     {% endblock settings %}
 </body>
     <!-- including settings where you can modify restaurant info and manage order-->

@@ -27,12 +27,14 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Tell Django to use the new custom user class
+AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # Application definition
 
 INSTALLED_APPS = [
-    # 'user.apps.UserConfig',
     # Our apps
+    'accounts',
     'res_owner',
     'user',
     # Django default apps
@@ -126,3 +128,8 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# OUR SETTINGS
+# Redirect to the url after a successful login attempt
+LOGIN_REDIRECT_URL = 'accounts:home_page'
+LOGOUT_REDIRECT_URL = 'accounts:ellis'

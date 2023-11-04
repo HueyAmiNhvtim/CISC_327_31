@@ -6,15 +6,15 @@
     <title>Home Page</title>
 </head>
 <body>
-    {% extends 'user/base.html' %}
+    {% extends 'registration/base.html' %}
     {% block content %}
-        <form action="{% url 'user:user_settings' %}" method="post">
-            {% csrf_token %}
-            <button name="user_settings_button">User Settings</button>
-        </form>
         <form action="{% url 'user:search' %}" method="post">
             {% csrf_token %}
             <button name="search_button">Search</button>
+        </form>
+        <form action="{% url 'user:shopping_cart' %}" method="post">
+            {% csrf_token %}
+            <button name="search_button">View Shopping Cart</button>
         </form>
         <form action="{% url 'user:view_orders' %}" method="post">
             {% csrf_token %}
