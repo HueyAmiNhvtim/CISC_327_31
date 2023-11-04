@@ -6,9 +6,6 @@ app_name = 'user'
 urlpatterns = [
     # User home page
     path('', views.user_home_page, name='user_home_page'),
-    # User settings to change user data
-    path('user_settings/<int:user_id>',
-         views.user_settings, name='user_settings'),
     # Search page
     path('search', views.search, name='search'),
     # Search results page
@@ -22,23 +19,23 @@ urlpatterns = [
     path('restaurant/<int:restaurant_id>/<str:category_name>/<str:food_name>',
          views.food, name='food'),
     # Add to shopping cart page
-    path('shopping_cart/<int:user_id>/add/<int:restaurant_id>/<int:food_id>',
+    path('shopping_cart/add/<int:restaurant_id>/<str:category_name>/<int:food_id>',
          views.add_to_shopping_cart, name='add_to_shopping_cart'),
     # Shopping cart page
-    path('shopping_cart/<int:user_id>',
+    path('shopping_cart/',
          views.shopping_cart, name='shopping_cart'),
     # Change item quantity page
-    path('shopping_cart/<int:user_id>/edit/<int:food_id>',
+    path('shopping_cart/edit/<int:food_id>',
          views.edit_quantity, name='edit_quantity'),
     # Remove food from shopping cart page
-    path('shopping_cart/<int:user_id>/remove/<int:food_id>',
+    path('shopping_cart/remove/<int:food_id>',
          views.remove_food, name='remove_food'),
     # Checkout page
-    path('checkout/<int:user_id>', views.checkout, name='checkout'),
+    path('checkout/', views.checkout, name='checkout'),
     # Order status page
-    path('<int:user_id>/view_orders', views.view_orders, name='view_orders'),
+    path('view_orders', views.view_orders, name='view_orders'),
     # Order details page
-    path('<int:user_id>/view_orders/<int:order_id>', views.order, name='order'),
+    path('view_orders/<int:order_id>', views.order, name='order'),
 
 
 ]

@@ -11,7 +11,7 @@
     <h1>{{ food.name }}</h1>
     ${{food.price}}
 
-    <form action="{% url 'user:add_to_shopping_cart' user.id restaurant.id food.id %}" method="post">
+    <form action="{% url 'user:add_to_shopping_cart' restaurant.id category_name food.id %}" method="post">
         {% csrf_token %}
         <label>How many would you like to buy?</label>
         {{ form.as_div }}

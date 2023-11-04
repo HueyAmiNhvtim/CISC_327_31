@@ -9,7 +9,7 @@
     {% extends 'user/base.html' %}
     {% block content %}
 
-    <form action="{% url 'user:edit_quantity' user.id food.id %}" method="post">
+    <form action="{% url 'user:edit_quantity' food.id %}" method="post">
         {% csrf_token %}
         <label>How many would you like to buy?</label>
         {{ form.as_div }}
