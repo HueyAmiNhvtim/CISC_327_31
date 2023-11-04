@@ -34,8 +34,7 @@ def register(request):
         form = CustomUserCreationForm(data=request.POST)
         if form.is_valid():
             new_user = form.save()
-            login(request, new_user)  # Might have to be changed since we're using
-            # custom User class
+            login(request, new_user)
             if new_user.is_res_owner is True:
                 return redirect('res_owner:res_home_page')
             else:

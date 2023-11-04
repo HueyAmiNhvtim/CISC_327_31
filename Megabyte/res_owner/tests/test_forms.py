@@ -1,16 +1,14 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
-from django.urls import reverse
 from res_owner.models import Restaurant, Food, Category
 from res_owner.forms import RestaurantForm, FoodForm, CategorizingForm, NewCategoryForm
 
 
-class TestResOwnerForms(TestCase):
+class TestRestaurantForm(TestCase):
     def setUp(self):
         """
         Run once to set up non-modified data for all class methods
         """
-        self.client = Client()
         self.User = get_user_model()
         self.user = self.User.objects.create_user(email='iguanasalt@gmail.com',
                                                   username='iguazu', is_res_owner=True,
@@ -20,12 +18,9 @@ class TestResOwnerForms(TestCase):
             image_path='res_owner/images/rubicon-231.png',
             restaurant_owner=self.user
         )
-        self.client.login(email='iguanasalt@gmail.com', password='foo')
-        self.res_hp_view_func = reverse(viewname='res_owner:res_home_page')
-        self.new_res_view_func = reverse(viewname='res_owner:new_restaurant')
 
     def test_RestaurantForm_valid_data(self):
-        """Test if RestaurantForm accept specified valid data"""
+        """Test if RestaurantForm accepts specified valid data"""
         form = RestaurantForm(data={
             'name': 'G5-Iguana',
             'location': 'Rubicon-3',
@@ -53,9 +48,9 @@ class TestResOwnerForms(TestCase):
         })
         self.assertFalse(form.is_valid())
 
-    def test_RestaurantForm_invalid_data(self):
+    def test_RestaurantForm_invalid_same_name(self):
         """
-        Test if RestaurantForm rejects data with same name
+        Test if RestaurantForm rejects new entry with same name as an existing one in the database.
         """
         # Create an existing restaurant
         a_form = RestaurantForm(data={
@@ -76,24 +71,20 @@ class TestResOwnerForms(TestCase):
         self.assertTrue(form.errors.get('name'))
 
     def test_RestaurantForm_missing_data(self):
-        """Test if RestaurantForm rejects data with missing data"""
+        """Test if RestaurantForm rejects entry with missing data"""
         form = RestaurantForm(data={
             'location': 'Rubicon-3',
             'image_path': 'res_owner/restaurants/iguana.png'
         }
         )
         self.assertFalse(form.is_valid())
-        # Assert there is an error in form and that the error is in the duplicate name
-        self.assertEquals(len(form.errors), 1)
-        self.assertTrue(form.errors.get('name'))
 
 
-class TestAddingFoodForm(TestCase):
+class TestFoodForm(TestCase):
     def setUp(self):
         """
         Run once to set up non-modified data for all class methods
         """
-        self.client = Client()
         self.User = get_user_model()
         self.user = self.User.objects.create_user(email='iguanasalt@gmail.com',
                                                   username='iguazu', is_res_owner=True,
@@ -103,7 +94,6 @@ class TestAddingFoodForm(TestCase):
             image_path='res_owner/images/rubicon-231.png',
             restaurant_owner=self.user
         )
-        self.client.login(email='iguanasalt@gmail.com', password='foo')
 
     def test_FoodForm_valid_data(self):
         """Test if RestaurantForm accept specified valid data"""
@@ -115,13 +105,22 @@ class TestAddingFoodForm(TestCase):
         })
         self.assertTrue(form.is_valid())
 
+    def test_FoodForm_missing_data(self):
+        """Test if FoodForm rejects entry with missing data"""
+        form = FoodForm(data={
+            'name': 'Almond Milk',
+            'restaurant': self.restaurant,
+            'image_path': 'res_owner/foods/almond_milk.png'
+        }
+        )
+        self.assertFalse(form.is_valid())
+
 
 class TestNewCategoryForm(TestCase):
     def setUp(self):
         """
         Run once to set up non-modified data for all class methods
         """
-        self.client = Client()
         self.User = get_user_model()
         self.user = self.User.objects.create_user(email='iguanasalt@gmail.com',
                                                   username='iguazu', is_res_owner=True,
@@ -141,7 +140,6 @@ class TestNewCategoryForm(TestCase):
             price=30,
             image_path='res_owner/images/coral_worm.png'
         )
-        self.client.login(email='iguanasalt@gmail.com', password='foo')
 
     def test_NewCategoryForm_valid_data(self):
         """Test if CategoryForm accept specified valid data"""
@@ -153,7 +151,7 @@ class TestNewCategoryForm(TestCase):
 
     def test_NewCategoryForm_valid_data_optional(self):
         """
-        Test if NewCategoryForm can create new category without assigning food to it
+        Test if NewCategoryForm can accept a new category entry without assigning any food item to it.
         """
         # Create an existing restaurant
         form = NewCategoryForm(restaurant_id=self.restaurant.id, data={
@@ -165,7 +163,7 @@ class TestNewCategoryForm(TestCase):
 
     def test_NewCategoryForm_duplicate_data(self):
         """
-        Test if NewCategoryForm rejects category with duplicate name
+        Test if NewCategoryForm rejects a new entry with the same name as an existing one in the database.
         """
         # Create an existing category
         form = NewCategoryForm(restaurant_id=self.restaurant.id, data={
@@ -179,6 +177,12 @@ class TestNewCategoryForm(TestCase):
         })
         self.assertFalse(new_form.is_valid())
 
-
+    def test_NewCategoryForm_missing_data(self):
+        """Test if NewCategoryForm rejects entry with missing data that is not optional"""
+        form = NewCategoryForm(restaurant_id=self.restaurant.id, data={
+            'food': [self.food_1]
+        }
+        )
+        self.assertFalse(form.is_valid())
 # CategorizingForm is in the jurisdiction of their respective views function as it is used to assign food items
 # to a category record

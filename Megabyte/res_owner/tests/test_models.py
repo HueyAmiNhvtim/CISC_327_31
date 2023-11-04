@@ -24,8 +24,8 @@ class TestRestaurantModel(TestCase):
         """
         User = get_user_model()
         self.user = User.objects.create_user(email='iguanasalt@gmail.com',
-                                        username='iguazu', is_res_owner=True,
-                                        password='foo')
+                                             username='iguazu', is_res_owner=True,
+                                             password='foo')
         # Create the restaurant object for testing.
         # user testing will run its own testing
         self.restaurant = Restaurant.objects.create(
@@ -37,7 +37,7 @@ class TestRestaurantModel(TestCase):
 
     def test_get_fields(self):
         """
-        Check that the model have the specified fields
+        Check that the Restaurant model has the following fields: [‘name’, ‘restaurant’, ‘price’, ‘image_path’]
         """
         raised = False
         try:
@@ -51,14 +51,13 @@ class TestRestaurantModel(TestCase):
 
     def test_foreign_key_user(self):
         """
-        Check that the model have the specified foreign key
+        Check that the Restaurant model has the specified foreign key that is the user.
         """
         self.assertEqual(self.restaurant.restaurant_owner.username, "iguazu")
 
     def test_max_length_of_fields(self):
         """
-        Check to make sure all fields' max lengths values of this model
-        are expected to equal specific numbers.
+        Check to make sure all max length values of all fields of this model correspond to the specifications.
         """
         max_name_length = self.restaurant._meta.get_field('name').max_length
         max_location_length = self.restaurant._meta.get_field('location').max_length
@@ -69,7 +68,7 @@ class TestRestaurantModel(TestCase):
 
     def test_unique_name(self):
         """
-        Check that restaurant's name field is unique
+        Check that the Restaurant model’s field ‘name’ is unique as specified.
         """
         self.raised = False
         try:
@@ -84,7 +83,8 @@ class TestRestaurantModel(TestCase):
 
     def test_delete(self):
         """
-        Check to make sure that when the User is deleted, the restaurant associated with the User is also deleted as well
+        Check to make sure that when the User is deleted,
+        the Restaurant record associated with that User is deleted as well.
         """
         res_name = self.restaurant.name
         self.user.delete()
@@ -116,7 +116,7 @@ class TestFoodModel(TestCase):
 
     def test_get_fields(self):
         """
-        Check that the model have the specified fields
+        Check that the Food model has the following fields: [‘name’, ‘restaurant’, ‘price’, ‘image_path’]
         """
         raised = False
         try:
@@ -136,8 +136,7 @@ class TestFoodModel(TestCase):
 
     def test_max_length_of_fields(self):
         """
-            Check to make sure all fields' max lengths values of this model
-            are expected to equal specific numbers.
+        Check that the Food model has the specified foreign key that is the Restaurant.
         """
         max_name_length = self.food._meta.get_field('name').max_length
         max_price_digits = self.food._meta.get_field('price').max_digits
@@ -148,7 +147,8 @@ class TestFoodModel(TestCase):
 
     def test_delete(self):
         """
-        Check to make sure that when the Restaurant is deleted, the food associated with the restaurant is also deleted as well
+        Check to make sure that when the Restaurant is deleted,
+        the Food record associated with that Restaurant is deleted as well.
         """
         food_name = self.food.name
         self.restaurant.delete()
@@ -191,12 +191,10 @@ class TestCategory(TestCase):
         self.category = Category.objects.create(
             name='Worms',
         )
-        self.category.food.add(self.food_1, self.food_2)
-        self.category.restaurant.add(self.restaurant_1, self.restaurant_2)
 
     def test_get_fields(self):
         """
-        Check that the model have the specified fields
+        Check that the Category model has the following fields: [‘name’, ‘restaurant’, food]
         """
         raised = False
         try:
@@ -207,31 +205,32 @@ class TestCategory(TestCase):
             raised = True
         self.assertFalse(raised, 'Some fields do not exist')
 
-    def test_foreign_key_restaurant(self):
+    def test_mtm_key_restaurant(self):
         """
         Check that the model have the specified key and that key represents the Many-to-Many field
         """
+        self.category.restaurant.add(self.restaurant_1, self.restaurant_2)
         self.assertTrue(self.category.restaurant.filter(name=self.restaurant_1.name) and
                         self.category.restaurant.get(name=self.restaurant_2.name))
 
-    def test_foreign_key_food(self):
+    def test_mtm_key_food(self):
         """
         Check that the model have the specified key and that key represents the Many-to-Many field
         """
+        self.category.food.add(self.food_1, self.food_2)
         self.assertTrue(self.category.food.filter(name=self.food_1.name) and
                         self.category.food.filter(name=self.food_2.name))
 
     def test_max_length_of_fields(self):
         """
-            Check to make sure all fields' max lengths values of this model
-            are expected to equal specific numbers.
+        Check to make sure all max length values of all fields of this model correspond to the specifications.
         """
         max_name_length = self.category._meta.get_field('name').max_length
         self.assertEqual(max_name_length, 200)
 
     def test_unique_name(self):
         """
-        Check that category's name field is unique
+        Check that the Category model’s field ‘name’ is unique as specified.
         """
         self.raised = False
         try:
@@ -242,8 +241,10 @@ class TestCategory(TestCase):
 
     def test_delete(self):
         """
-        Check to make sure that when the category is deleted, nothing associated with it is also accidentally deleted
+        Check to make sure that when a Category is deleted, nothing associated with it is also accidentally deleted
         """
+        self.category.restaurant.add(self.restaurant_1, self.restaurant_2)
+        self.category.food.add(self.food_1, self.food_2)
         self.category.delete()
         # Assert no restaurants got obliterated off the database
         self.assertTrue(Restaurant.objects.filter(name=self.restaurant_1.name) and
@@ -251,6 +252,3 @@ class TestCategory(TestCase):
         # Assert no food got obliterated off the database
         self.assertTrue(Food.objects.filter(name=self.food_1.name) and
                         Food.objects.filter(name=self.food_2.name))
-
-
-
