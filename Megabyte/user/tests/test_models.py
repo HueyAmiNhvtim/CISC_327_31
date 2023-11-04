@@ -89,7 +89,7 @@ class TestOrderModel(TestCase):
                                                    username='Owner1', is_res_owner=True,
                                                    password="IAmAn0wner")
         self.user = User.objects.create_user(email='user@gmail.com',
-                                             username='user', is_res_owner=False,
+                                             username='User', is_res_owner=False,
                                              password="IAmAUs3r")
 
         # Create restuarants
@@ -120,3 +120,15 @@ class TestOrderModel(TestCase):
         except FieldDoesNotExist:
             raised = True
         self.assertFalse(raised, 'One or more fields do not exist')
+
+    def test_max_length_of_fields(self):
+        """
+        Check to make sure all fields' max lengths values of this model
+        are expected to equal specific numbers
+        """
+        # Retrieve maximum length of fields
+        max_status_length = self.order._meta.get_field('status').max_length
+
+        # Test field lengths
+        self.assertEqual(max_status_length, 9,
+                         'Invalid maximum length of status field')

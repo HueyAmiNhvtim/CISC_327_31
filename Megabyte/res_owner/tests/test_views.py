@@ -298,7 +298,6 @@ class TestNewCategory(TestCase):
 
 
         # self.assertTrue()
-x
     # No testing duplicate that violates the unique key constraint.
     # since self.client.post basically bypassed through the forms.is_valid()
     # That should be the responsibility of the forms.is_valid() methinks
