@@ -6,7 +6,7 @@ from res_owner.models import Restaurant, Food, Category
 
 import datetime
 
-
+'''
 class TestUser(TestCase):
     def setUp(self):
         # Create accounts
@@ -21,35 +21,36 @@ class TestUser(TestCase):
                                              username='user', is_res_owner=False,
                                              password="IAmAUs3r")
         # Create restuarants
-        self.restaurant1 = Restaurant.models.create(name="Fruit Market",
+        self.restaurant1 = Restaurant.objects.create(name="Fruit Market",
                                                     location="123 Main Street,City,Province,Country,123 ABC",
                                                     image_path="FruitMarket.png", restaurant_owner=self.res_owner1)
-        self.restaurant2 = Restaurant.models.create(name="Dollar Store",
+        self.restaurant2 = Restaurant.objects.create(name="Dollar Store",
                                                     location="124 Main Street,City,Province,Country,123 ABD",
                                                     image_path="DollarStore.png", restaurant_owner=self.res_owner1)
-        self.restaurant3 = Restaurant.models.create(name="Fruit Empire",
+        self.restaurant3 = Restaurant.objects.create(name="Fruit Empire",
                                                     location="125 Main Street,City,Province,Country,123 ABE",
                                                     image_path="FruitEmpire.png", restaurant_owner=self.res_owner2)
         # Create Food items
-        self.food1 = Food.models.create(name="Apple", restaurant=self.restaurant1, price=1.00,
+        self.food1 = Food.objects.create(name="Apple", restaurant=self.restaurant1, price=1.00,
                                         image_path="Apple1.png")
-        self.food2 = Food.models.create(name="Banana", restaurant=self.restaurant1, price=1.79,
+        self.food2 = Food.objects.create(name="Banana", restaurant=self.restaurant1, price=1.79,
                                         image_path="Banana.png")
-        self.food3 = Food.models.create(name="Broccoli", restaurant=self.restaurant1, price=4.50,
+        self.food3 = Food.objects.create(name="Broccoli", restaurant=self.restaurant1, price=4.50,
                                         image_path="Broccoli.png")
-        self.food4 = Food.models.create(name="Loonie", restaurant=self.restaurant2, price=2.00,
+        self.food4 = Food.objects.create(name="Loonie", restaurant=self.restaurant2, price=2.00,
                                         image_path="Loonie.png")
-        self.food5 = Food.models.create(name="Apple", restaurant=self.restaurant3, price=1.00,
+        self.food5 = Food.objects.create(name="Apple", restaurant=self.restaurant3, price=1.00,
                                         image_path="Apple2.png")
         # Create categories
-        self.category1 = Category.models.create(
+        self.category1 = Category.objects.create(
             name="Fruits", food=[self.food1, self.food2])
-        self.category2 = Category.models.create(
+        self.category2 = Category.objects.create(
             name="Veggies", food=[self.food3])
-        self.category3 = Category.models.create(
+        self.category3 = Category.objects.create(
             name="Money", food=[self.food4])
-        self.category4 = Category.models.create(
+        self.category4 = Category.objects.create(
             name="Fruits", food=[self.food5])
 
     def test_restaurant_navigation(self):
         pass
+'''

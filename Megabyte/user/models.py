@@ -28,8 +28,21 @@ class Location(models.Model):
 
 class Order(models.Model):
     """Model representation of an order"""
+    ORDER_STATUSES = (
+    ("0", "Not sent"),
+    ("1", "Sent"),
+    ("2", "Accepted"),
+    ("3", "Prepared"),
+    ("4", "Delivered"),
+    ("5", "Rejected")
+    )
+
     user = models.PositiveIntegerField()
-    status = models.TextChoices("status", "Sent Accepted Prepared Delivered")
+    status = models.CharField( 
+        max_length = 9, 
+        choices = ORDER_STATUSES, 
+        default = '1'
+        ) 
     date_and_time = models.DateTimeField()
     cart = models.JSONField(default=list)
 
