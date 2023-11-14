@@ -14,7 +14,7 @@ class RegistTest(LiveServerTestCase):
         time.sleep(3)
         self.driver.quit()
 
-    def test_regist_user(self):
+    def test_regist_01_user(self):
         # user regist
         browser = self.driver
         browser.find_element(By.LINK_TEXT, 'Register').click()
@@ -28,7 +28,7 @@ class RegistTest(LiveServerTestCase):
         self.assertTrue(len(result), 1)
 
 
-    def test_regist_res_owner(self):
+    def test_regist_02_res_owner(self):
         # res owner regist
         browser = self.driver
         browser.find_element(By.LINK_TEXT, 'Register').click()
