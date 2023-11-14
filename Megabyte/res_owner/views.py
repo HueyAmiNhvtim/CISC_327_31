@@ -370,6 +370,7 @@ def edit_food(request, food_id: int):
             or a redirect to the home page upon a successful POST request.
     """
     this_food = Food.objects.get(id=food_id)
+    this_restaurant = this_food.restaurant
     # Check to make sure different user cannot enter into other users' pages
     if this_food.restaurant.restaurant_owner != request.user:
         raise Http404
@@ -381,7 +382,7 @@ def edit_food(request, food_id: int):
         # POST request type confirmed, process data
         form = FoodForm(instance=this_food, data=request.POST)
         # Might have to change it once custom form validation is implemented.
-        if form.is_valid():
+        if form.is_valid() and not this_restaurant.food_set.filter(name=request.POST.get('name')):
             form.save()
             return redirect('res_owner:res_home_page')
     # This sends the context to render the edit_restaurant.html

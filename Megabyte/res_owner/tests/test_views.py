@@ -121,6 +121,43 @@ class TestNewRestaurant(TestCase):
     # That should be the responsibility of the forms.is_valid() methinks
 
 
+class TestDeleteRestaurant(TestCase):
+    def setUp(self):
+        """
+        Run once to set up non-modified data for all class methods
+        """
+        self.client = Client()
+        self.User = get_user_model()
+        self.user = self.User.objects.create_user(email='iguanasalt@gmail.com',
+                                                  username='iguazu', is_res_owner=True,
+                                                  password='foo')
+        self.restaurant = Restaurant.objects.create(
+            name='Almond', location='Rubicon-231',
+            image_path='res_owner/images/rubicon-231.png',
+            restaurant_owner=self.user
+        )
+        self.food = Food.objects.create(name='Almond Milk',
+                                        restaurant=self.restaurant,
+                                        price=21,
+                                        image_path='res_owner/foods/almond_milk.png')
+        self.client.login(email='iguanasalt@gmail.com', password='foo')
+        # 1 for the id of the restaurant created
+        self.delete_res_func = reverse(viewname='res_owner:delete_restaurant', args=[self.restaurant.id])
+        self.res_hp_view_func = reverse(viewname='res_owner:res_home_page')
+
+    def test_delete_restaurant_POST(self):
+        """
+        Test that the view function delete_restaurant accepts the POST request and delete the Restaurant
+        """
+        response = self.client.post(self.delete_res_func)
+
+        # Assert that upon a successful completion of the code, the page is redirected to the restaurant page
+        self.assertRedirects(response, self.res_hp_view_func, status_code=302)
+        # Assert that the restaurant and its associating food item actually gets obliterated off the database
+        self.assertFalse(Restaurant.objects.all())
+        self.assertFalse(Food.objects.all())
+
+
 class TestNewFood(TestCase):
     def setUp(self):
         """
@@ -196,6 +233,81 @@ class TestNewFood(TestCase):
         self.assertEqual(Food.objects.get(name='Almond Milk').price, 20)
 
 
+class TestEditFood(TestCase):
+    def setUp(self):
+        """
+        Run once to set up non-modified data for all class methods
+        """
+        self.client = Client()
+        self.User = get_user_model()
+        self.user = self.User.objects.create_user(email='iguanasalt@gmail.com',
+                                                  username='iguazu', is_res_owner=True,
+                                                  password='foo')
+        self.restaurant = Restaurant.objects.create(
+            name='Almond', location='Rubicon-231',
+            image_path='res_owner/images/rubicon-231.png',
+            restaurant_owner=self.user
+        )
+        self.food_one = Food.objects.create(
+            name='Coral Worms', restaurant=self.restaurant,
+            price=20,
+            image_path='res_owner/images/coral_worm.png'
+        )
+        self.food_two = Food.objects.create(
+            name='Worms Sushi BAWS special', restaurant=self.restaurant,
+            price=30,
+            image_path='res_owner/images/coral_worm.png'
+        )
+        self.client.login(email='iguanasalt@gmail.com', password='foo')
+        # 1 for the id of the restaurant created
+        self.res_hp_view_func = reverse(viewname='res_owner:res_home_page')
+        self.edit_food_func = reverse(viewname='res_owner:edit_food', args=[self.food_one.id])
+
+    def test_edit_food_GET(self):
+        """
+        Test that the view function edit_food accepts the GET request and renders the correct HTML page.
+        """
+        response = self.client.get(self.edit_food_func)
+        # Assert that the request is successful
+        self.assertEquals(response.status_code, 200)
+        # Assert that the html page is used
+        self.assertTemplateUsed(response, 'res_owner/edit_food.html')
+
+    def test_edit_food_POST_success(self):
+        """
+        Test that the view function edit_food accepts the valid edit of a Food item and
+        makes sure it redirects to the appropriate page.
+        """
+        response = self.client.post(self.edit_food_func, {
+            'name': 'Almond Milk',
+            'price': 20,
+            'image_path': 'res_owner/foods/almond_milk.png'
+        })
+
+        # Assert that upon a successful completion of the code, the page is redirected to the homepage
+        self.assertRedirects(response, self.res_hp_view_func, status_code=302)
+        # Assert that there is a restaurant associated with the User
+        self.assertTrue(self.restaurant.food_set.filter(name='Almond Milk'))
+
+    def test_edit_food_POST_duplicate(self):
+        """
+        Test that the view function edit rejects the changing of a Food item to one with the same name.
+        This test is here instead of in test_forms because the database allows adding multiple food items
+        of the same name. But a restaurant can only allow unique food names within that restaurant,
+        and the corresponding view function handles that part.
+        """
+        response = self.client.post(self.edit_food_func, {
+            'name': 'Worms Sushi BAWS special',
+            'price': 20,
+            'image_path': 'res_owner/foods/more_worms.png'
+        })
+
+        # Assert that upon an unsuccessful post, the page will just be rendered again
+        self.assertEqual(response.status_code, 200)
+        # Assert that the price of the original Food is still unchanged
+        self.assertEqual(Food.objects.get(name='Worms Sushi BAWS special').price, 30)
+
+
 class TestDeleteFood(TestCase):
     def setUp(self):
         """
@@ -220,7 +332,7 @@ class TestDeleteFood(TestCase):
         self.delete_food_func = reverse(viewname='res_owner:delete_food', args=[1])
         self.restaurant_func = reverse(viewname='res_owner:restaurant', args=[self.restaurant.id])
 
-    def test_delete_food_GET(self):
+    def test_delete_food_POST(self):
         """
         Test that the view function delete_food accepts the POST request and delete the Food item.
         """
