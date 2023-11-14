@@ -41,32 +41,8 @@ class TestUser(LiveServerTestCase):
         self.cat_1.food.add(self.food_1)
         self.cat_1.food.add(self.food_2)
         
-        #print(Restaurant.objects.order_by('location'))
         
     def test_user(self):
-        '''
-        self.User = get_user_model()
-        # Create user and owner accounts
-
-        self.user = self.User.objects.create_user(email='test_user3@gmail.com', 
-                                                username='test_User3', is_res_owner=False, 
-                                                password='IAmAUs3r')
-        self.res_owner1 = self.User.objects.create_user(email='test_owner1@gmail.com', 
-                                                username='test_owner1', is_res_owner=True, 
-                                                password='IAmAn0wner')
-        self.res_owner2 = self.User.objects.create_user(email='test_owner2@gmail.com', 
-                                                username='test_owner2', is_res_owner=True, 
-                                                password='IAmAn0wner')
-        self.res_1 = Restaurant.objects.create(name='Fruit Market', 
-                                location='123 Main Street,City,Province,Country,123 ABC', 
-                                image_path='FruitMarket.png', restaurant_owner=self.res_owner1)
-        self.res_2 = Restaurant.objects.create(name='Dollar Store', 
-                                location='124 Main Street,City,Province,Country,123 ABD', 
-                                image_path='DollarStore.png', restaurant_owner=self.res_owner1)
-        self.res_3 = Restaurant.objects.create(name='Fruit Empire', 
-                                location='125 Main Street,City,Province,Country,123 ABE', 
-                                image_path='FruitEmpire.png', restaurant_owner=self.res_owner2)
-        '''
         driver = webdriver.Chrome()
         driver.get('http://127.0.0.1:8000/user_stuff/login/')
 
@@ -82,7 +58,7 @@ class TestUser(LiveServerTestCase):
         login_button = driver.find_element(By.NAME, 'submit')
 
         # Enter login info
-        email_input.send_keys('test_user@gmail.com')
+        email_input.send_keys('test_user1@gmail.com')
         password_input.send_keys('IAmAUs3r')
 
         # Submit
@@ -98,7 +74,7 @@ class TestUser(LiveServerTestCase):
         assert driver.current_url == 'http://127.0.0.1:8000/%5Ehome/$' or driver.current_url == 'http://127.0.0.1:8000/user/' or driver.current_url == 'http://127.0.0.1:8000/home/'
 
         # Verify that user's username is displayed correctly on the home page
-        assert 'Hello, test_User' in driver.page_source
+        assert 'Hello, test_User1' in driver.page_source
 
         search_button = driver.find_element(By.NAME, 'search_button')
         search_button.click()
