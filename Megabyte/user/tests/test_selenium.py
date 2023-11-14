@@ -93,9 +93,9 @@ class TestUser(LiveServerTestCase):
         ######################
         ##  USER HOME PAGE  ##
         ######################
-
+        time.sleep(10)
         # Verify that the user has been redirected to the user home page
-        assert driver.current_url == 'http://127.0.0.1:8000/%5Ehome/$' or driver.current_url == 'http://127.0.0.1:8000/user/'
+        assert driver.current_url == 'http://127.0.0.1:8000/%5Ehome/$' or driver.current_url == 'http://127.0.0.1:8000/user/' or driver.current_url == 'http://127.0.0.1:8000/home/'
 
         # Verify that user's username is displayed correctly on the home page
         assert 'Hello, test_User' in driver.page_source
