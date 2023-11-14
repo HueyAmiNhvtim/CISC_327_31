@@ -15,8 +15,8 @@ class TestUser(LiveServerTestCase):
         self.User = get_user_model()
         # Create user and owner accounts
         
-        self.user = self.User.objects.create_user(email='test_user1@gmail.com', 
-                                                  username='test_User1', is_res_owner=False, 
+        self.user = self.User.objects.create_user(email='test_user@gmail.com', 
+                                                  username='test_User', is_res_owner=False, 
                                                   password='IAmAUs3r')
         self.res_owner1 = self.User.objects.create_user(email='test_owner1@gmail.com', 
                                                   username='test_owner1', is_res_owner=True, 
@@ -58,7 +58,7 @@ class TestUser(LiveServerTestCase):
         login_button = driver.find_element(By.NAME, 'submit')
 
         # Enter login info
-        email_input.send_keys('test_user1@gmail.com')
+        email_input.send_keys('test_user@gmail.com')
         password_input.send_keys('IAmAUs3r')
 
         # Submit
@@ -74,7 +74,7 @@ class TestUser(LiveServerTestCase):
         assert driver.current_url == 'http://127.0.0.1:8000/%5Ehome/$' or driver.current_url == 'http://127.0.0.1:8000/user/' or driver.current_url == 'http://127.0.0.1:8000/home/'
 
         # Verify that user's username is displayed correctly on the home page
-        assert 'Hello, test_User1' in driver.page_source
+        assert 'Hello, test_User' in driver.page_source
 
         search_button = driver.find_element(By.NAME, 'search_button')
         search_button.click()
