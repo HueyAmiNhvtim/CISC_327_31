@@ -129,10 +129,8 @@ class TestUser(LiveServerTestCase):
         
         restaurant_1 = driver.find_element(By.LINK_TEXT, 'Fruit Market')
         # Error due to views not updating with new objects
-        '''
         restaurant_2 = driver.find_element(By.LINK_TEXT, 'Dollar Store')
         restaurant_3 = driver.find_element(By.LINK_TEXT, 'Fruit Empire')
-        '''
 
         # Go to restaurant 1 (Fruit Market)'s menu
         restaurant_1.click()
@@ -173,9 +171,7 @@ class TestUser(LiveServerTestCase):
         food_1 = driver.find_element(By.LINK_TEXT, 'Apple $1.000000') # Still has trailing zeros
         
         # Same error due to views not updating the objects
-        '''
         food_2 = driver.find_element(By.LINK_TEXT, 'Banana $0.500000')
-        '''
 
         # Go to food 1 (Apple)'s page
         food_1.click()
