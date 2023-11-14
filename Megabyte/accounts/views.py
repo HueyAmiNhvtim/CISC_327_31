@@ -61,7 +61,7 @@ def edit_user(request):
         if form.is_valid():
             form.save()
             # if is_res_owner, send straight to restaurant_owner home page
-            # if user, send to the user equivalent.
+            # if user, send to the user equivalent. 
             if request.user.is_res_owner is True:
                 return redirect('res_owner:res_home_page')
             else:
