@@ -5,6 +5,7 @@ from django.urls import reverse
 from res_owner.models import Restaurant, Food, Category
 from res_owner.forms import NewCategoryForm, CategorizingForm
 
+
 # NOTE: THIS IS INEFFICIENT due to the overhead cost of creating the dummy database and all the other stuff
 # in each class.setUp... and I will fix it later when I have the time
 
@@ -247,6 +248,11 @@ class TestNewCategory(TestCase):
             image_path='res_owner/images/rubicon-231.png',
             restaurant_owner=self.user
         )
+        self.restaurant_two = Restaurant.objects.create(
+            name='Freelancer', location='Rubicon-231',
+            image_path='res_owner/images/621.png',
+            restaurant_owner=self.user
+        )
         self.food_one = Food.objects.create(
             name='Coral Worms', restaurant=self.restaurant,
             price=20,
@@ -257,8 +263,15 @@ class TestNewCategory(TestCase):
             price=30,
             image_path='res_owner/images/coral_worm.png'
         )
+        self.food_three = Food.objects.create(
+            name='Meal Worms sashimi', restaurant=self.restaurant_two,
+            price=20,
+            image_path='res_owner/images/worm_sashimi.png'
+        )
         self.res_hp_view_func = reverse(viewname='res_owner:res_home_page')
+
         self.new_cat_view_func = reverse(viewname='res_owner:new_category', args=[self.restaurant.id])
+        self.new_cat_second_res_view_func = reverse(viewname='res_owner:new_category', args=[self.restaurant_two.id])
 
     def test_new_category_GET(self):
         """
@@ -274,8 +287,6 @@ class TestNewCategory(TestCase):
         """
         Test that the view function new_category accepts the valid registration of a Category and makes sure
         it redirects to the appropriate page.
-        Currently non-functional due to the form_data to pass into the self.client.post being wonky because
-        the NewCategoryForm has a ModelMultipleChoiceField. This works when testing on browsers but not in this test.
         """
         # When do client posting this time, the food has to be a list of food.id for MultipleChoiceField
         # the form_data is currently not working....
@@ -289,23 +300,182 @@ class TestNewCategory(TestCase):
         self.assertRedirects(response, self.res_hp_view_func, status_code=302)
         # Assert that there is a Category created
         self.assertTrue(Category.objects.filter(name='Snail'))
+        category = Category.objects.get(name='Snail')
         # Assert the restaurant and the food is associated with it
         self.assertTrue(self.restaurant.category_set.filter(name='Snail'))
         self.assertTrue(Category.objects.filter(name='Snail'))
-        # Somehow the test doesn't work with ModelMultipleChoiceField. THIS IS NOT WORKING
-        self.assertTrue(self.food_one.category_set.filter(name='Snail'))
-        self.assertTrue(self.food_two.category_set.filter(name='Snail'))
+        self.assertTrue(category in self.food_one.category_set.all())
+        self.assertTrue(category in self.food_two.category_set.all())
 
-
-        # self.assertTrue()
     # No testing duplicate that violates the unique key constraint.
     # since self.client.post basically bypassed through the forms.is_valid()
     # That should be the responsibility of the forms.is_valid() methinks
+    def test_new_category_ensure_no_category_deletion_from_different_restaurants(self):
+        """
+        Test that the view function new_category does not make the category disappear of the food from the other
+        restaurants. This is white-box because the implementation of the ModelMultipleChoiceField will automatically
+        remove options not shown on the page if not careful
+        """
+        form_data = {
+            'name': 'Snail',
+            'food': [str(self.food_one.id), str(self.food_two.id)],  # ID this time for MultipleChoiceField
+        }
+
+        response_1 = self.client.post(self.new_cat_view_func, data=form_data)
+        form_data_res_two = {
+            'name': 'Snail',
+            'food': [str(self.food_three.id)],  # ID this time for MultipleChoiceField
+        }
+        response_2 = self.client.post(self.new_cat_second_res_view_func, data=form_data_res_two)
+        category = Category.objects.get(name='Snail')
+        # Assert that food_one and food_two from another restaurant still retains the category
+        self.assertTrue(category in self.food_one.category_set.all())
+        self.assertTrue(category in self.food_two.category_set.all())
 
 
-# class TestDeleteCategory(TestCase):
-#     pass
-#
-#
-# class TestCategorize(TestCase):
-#     pass
+class TestDeleteCategory(TestCase):
+    def setUp(self):
+        """
+        Run once to set up non-modified data for all class methods
+        """
+        self.client = Client()
+        self.User = get_user_model()
+        self.user = self.User.objects.create_user(email='iguanasalt@gmail.com',
+                                                  username='iguazu', is_res_owner=True,
+                                                  password='foo')
+        self.client.login(email='iguanasalt@gmail.com', password='foo')
+        self.restaurant = Restaurant.objects.create(
+            name='Almond', location='Rubicon-231',
+            image_path='res_owner/images/rubicon-231.png',
+            restaurant_owner=self.user
+        )
+        self.food_one = Food.objects.create(
+            name='Coral Worms', restaurant=self.restaurant,
+            price=20,
+            image_path='res_owner/images/coral_worm.png'
+        )
+        self.food_two = Food.objects.create(
+            name='Worms Sushi BAWS special', restaurant=self.restaurant,
+            price=30,
+            image_path='res_owner/images/coral_worm.png'
+        )
+        self.category_to_delete = Category.objects.create(name='Worms')
+        self.category_to_delete.food.add(self.food_one, self.food_two)
+        self.category_to_delete.restaurant.add(self.restaurant)
+        self.res_hp_view_func = reverse(viewname='res_owner:res_home_page')
+        self.delete_cat_view_func = reverse(viewname='res_owner:delete_category', args=[self.category_to_delete.name,
+                                                                                        self.restaurant.id])
+        self.cat_others_view_func = reverse(viewname='res_owner:cat_others', args=[self.restaurant.id])
+
+    def test_delete_category_POST_success(self):
+        """
+        Test that the view function delete_category deletes the category and redirects to the appropriate page
+        """
+        response = self.client.post(self.delete_cat_view_func)
+
+        # Assert that upon a successful completion of the code, the page is redirected to the restaurant page
+        self.assertRedirects(response, self.res_hp_view_func, status_code=302)
+        # Assert that the category actually gets obliterated off the database.
+        # Design allows the category to exist in the delete_category....
+        # self.assertFalse(Category.objects.all())
+        # Assert that the food still exists and appears in the Others section instead
+        self.assertTrue(Food.objects.filter(name=self.food_one.name) and Food.objects.filter(name=self.food_two.name))
+        response_post_delete = self.client.get(self.cat_others_view_func)
+        self.assertTrue(self.food_one in response_post_delete.context['foods'] and
+                        self.food_two in response_post_delete.context['foods'])
+
+
+class TestCategorizing(TestCase):
+    def setUp(self):
+        """
+        Run once to set up non-modified data for all class methods
+        """
+        self.client = Client()
+        self.User = get_user_model()
+        self.user = self.User.objects.create_user(email='iguanasalt@gmail.com',
+                                                  username='iguazu', is_res_owner=True,
+                                                  password='foo')
+        self.client.login(email='iguanasalt@gmail.com', password='foo')
+        self.restaurant = Restaurant.objects.create(
+            name='Almond', location='Rubicon-231',
+            image_path='res_owner/images/rubicon-231.png',
+            restaurant_owner=self.user
+        )
+        self.restaurant_two = Restaurant.objects.create(
+            name='Freelancer', location='Rubicon-231',
+            image_path='res_owner/images/621.png',
+            restaurant_owner=self.user
+        )
+        self.food_one = Food.objects.create(
+            name='Coral Worms', restaurant=self.restaurant,
+            price=20,
+            image_path='res_owner/images/coral_worm.png'
+        )
+        self.food_two = Food.objects.create(
+            name='Worms Sushi BAWS special', restaurant=self.restaurant,
+            price=30,
+            image_path='res_owner/images/coral_worm.png'
+        )
+        self.food_three = Food.objects.create(
+            name='Meal Worms sashimi', restaurant=self.restaurant_two,
+            price=20,
+            image_path='res_owner/images/worm_sashimi.png'
+        )
+        self.category = Category.objects.create(name='Worms')
+        self.category.restaurant.add(self.restaurant, self.restaurant_two)
+        self.res_hp_view_func = reverse(viewname='res_owner:res_home_page')
+        self.categorizing_view_func = reverse(viewname='res_owner:categorizing', args=[self.category.name,
+                                                                                       self.restaurant.id])
+        self.categorizing_second_res_view_func = reverse(viewname='res_owner:categorizing', args=[self.category.name,
+                                                                                                  self.restaurant_two.id])
+        self.cat_others_view_func = reverse(viewname='res_owner:cat_others', args=[self.restaurant.id])
+        self.cat_view_func = reverse(viewname='res_owner:category', args=[self.category.name, self.restaurant.id])
+
+    def test_categorizing_GET(self):
+        """
+        Test that the view function categorizing accepts the GET request and renders the correct HTML page.
+        """
+        response = self.client.get(self.categorizing_view_func)
+        # Assert that the request is successful
+        self.assertEquals(response.status_code, 200)
+        # Assert that the correct html page is used
+        self.assertTemplateUsed(response, 'res_owner/categorizing.html')
+
+    def test_categorizing_POST_success(self):
+        """
+        Test that the view function categorizing accepts the assignment of a category to the food items of a restaurant
+        and makes sure it redirects to the appropriate page after said successful operations.
+        """
+        # When do client posting this time, the food has to be a list of food.id for MultipleChoiceField
+        # the form_data is currently not working....
+        form_data = {
+            'food': [str(self.food_one.id), str(self.food_two.id)],  # ID this time for MultipleChoiceField
+        }
+        response = self.client.post(self.categorizing_view_func, data=form_data)
+        # Assert that upon a successful completion of the code, the page is redirected to the homepage
+        self.assertRedirects(response, self.res_hp_view_func, status_code=302)
+
+        # Assert that the food item also has the category now
+        self.assertTrue(self.category in self.food_one.category_set.all())
+        self.assertTrue(self.category in self.food_two.category_set.all())
+
+        response_two = self.client.get(self.cat_view_func)
+        self.assertTrue(self.food_one in response_two.context['foods'] and
+                        self.food_two in response_two.context['foods'])
+
+    def test_categorizing_ensure_no_category_deletion_from_different_restaurants(self):
+        """
+        Test that the view function categorizing does not make the category disappear of the food from the other
+        restaurants. This is white-box because the implementation of the ModelMultipleChoiceField will automatically
+        remove options not shown on the page if not careful
+        """
+        self.category.food.add(self.food_three)
+        # When do client posting this time, the food has to be a list of food.id for MultipleChoiceField
+        # the form_data is currently not working....
+        form_data = {
+            'food': [str(self.food_one.id), str(self.food_two.id)],  # ID this time for MultipleChoiceField
+        }
+        response = self.client.post(self.categorizing_view_func, data=form_data)
+        # Assert that food_three from another restaurant still retains the category
+        self.assertTrue(self.category in self.food_three.category_set.all())
+

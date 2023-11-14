@@ -153,10 +153,12 @@ def new_category(request, restaurant_id: int):
                     instance=this_category
                 )
         if form.is_valid():
-            # Save first then add later
+            # Save first then add later THIS SEQUENCE IS IMPORTANT!!!!!!!  Do not remove any of the 3 lines,
+            # otherwise the test will flag the heck out of this view function.
             new_category = form.save(commit=False)
             new_category.save()
             new_category.restaurant.add(this_restaurant)
+            form.save_m2m()
             if len(form.food_not_in_res) > 0:
                 existing_cat_name = form.data['name']
                 this_category = Category.objects.get(name=existing_cat_name)
