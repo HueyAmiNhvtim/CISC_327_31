@@ -24,7 +24,7 @@ class EditInfoTest(LiveServerTestCase):
         browser.find_element(By.XPATH, '/html/body/form[6]/button').click()
         # edit info
         browser.find_element(By.NAME, 'username').clear()
-        browser.find_element(By.NAME, 'username').send_keys('test12@123.com')
+        browser.find_element(By.NAME, 'username').send_keys('test12')
         browser.find_element(By.NAME, 'email').clear()
         browser.find_element(By.NAME, 'email').send_keys('test12@123.com')
         browser.find_element(By.NAME, 'submit').click()
@@ -40,7 +40,7 @@ class EditInfoTest(LiveServerTestCase):
         browser.find_element(By.NAME, 'password').send_keys('testpassword')
         browser.find_element(By.NAME, 'submit').click()
         browser.find_element(By.XPATH, '/html/body/form[6]/button').click()
-        browser.find_element(By.LINK_TEXT, 'this form')
+        browser.find_element(By.LINK_TEXT, 'this form').click()
         # change password
         browser.find_element(By.NAME, 'old_password').send_keys('testpassword')
         browser.find_element(By.NAME, 'new_password1').send_keys('testpwd123')
