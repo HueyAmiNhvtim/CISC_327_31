@@ -43,8 +43,8 @@ class EditInfoTest(LiveServerTestCase):
         browser.find_element(By.LINK_TEXT, 'this form').click()
         # change password
         browser.find_element(By.NAME, 'old_password').send_keys('testpassword')
-        browser.find_element(By.NAME, 'new_password1').send_keys('testpwd123')
-        browser.find_element(By.NAME, 'new_password2').send_keys('testpwd123')
+        browser.find_element(By.NAME, 'new_password1').send_keys('tt12pwd123')
+        browser.find_element(By.NAME, 'new_password2').send_keys('tt12pwd123')
         browser.find_element(By.NAME, 'submit').click()
         # check result
         result = browser.find_elements(By.NAME, 'user_settings_button')
