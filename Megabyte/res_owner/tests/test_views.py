@@ -471,7 +471,7 @@ class TestNewCategory(TestCase):
         }
 
         response_two = self.client.post(self.new_cat_view_func, data=form_data)
-        # Assert that the page is just rendered again upon an invalid form.
+        # Assert that no redirects happens.
         self.assertEquals(response_two.status_code, 200)
         # Assert that the page is just rendered again.
         self.assertTemplateUsed(response_two, 'res_owner/new_category.html')
@@ -570,7 +570,6 @@ class TestNewCategory(TestCase):
         self.assertTrue(category in self.food_four.category_set.all())
 
 
-
 class TestDeleteCategory(TestCase):
     def setUp(self):
         """
@@ -659,6 +658,16 @@ class TestCategorizing(TestCase):
             price=20,
             image_path='res_owner/images/worm_sashimi.png'
         )
+        self.food_four = Food.objects.create(
+            name='Worms Specialz', restaurant=self.restaurant_two,
+            price=10,
+            image_path='res_owner/images/special_worms.png'
+        )
+        self.food_five = Food.objects.create(
+            name='Worms Bornemissza', restaurant=self.restaurant_two,
+            price=10,
+            image_path='res_owner/images/worms_tank.png'
+        )
         self.category = Category.objects.create(name='Worms')
         self.category.restaurant.add(self.restaurant, self.restaurant_two)
         self.res_hp_view_func = reverse(viewname='res_owner:res_home_page')
@@ -668,6 +677,32 @@ class TestCategorizing(TestCase):
                                                                                                   self.restaurant_two.id])
         self.cat_others_view_func = reverse(viewname='res_owner:cat_others', args=[self.restaurant.id])
         self.cat_view_func = reverse(viewname='res_owner:category', args=[self.category.name, self.restaurant.id])
+
+    def test_exclusive_access(self):
+        """
+        Test that the view function categorizing that only allows a restaurant owner to access it.
+        """
+        another_user = self.User.objects.create_user(email='hehehackerboi@gmail.com',
+                                                     username='anon', is_res_owner=True,
+                                                     password='foo')
+        another_client = Client()
+        another_client.login(email='hehehackerboi@gmail.com', password='foo')
+        response = another_client.get(self.cat_view_func)
+        self.assertEqual(response.status_code, 404)
+
+    def test_categorizing_invalid_form(self):
+        """
+        Test that the view function categorizing rejects invalid form, which is one that contains invalid food id.
+        """
+        form_data = {
+            'food': ['99'],  # ID this time for MultipleChoiceField
+        }
+
+        response = self.client.post(self.categorizing_view_func, data=form_data)
+        # Assert that no redirect happens
+        self.assertEquals(response.status_code, 200)
+        # Assert that the page is just rendered again.
+        self.assertTemplateUsed(response, 'res_owner/categorizing.html')
 
     def test_categorizing_GET(self):
         """
@@ -701,19 +736,63 @@ class TestCategorizing(TestCase):
         self.assertTrue(self.food_one in response_two.context['foods'] and
                         self.food_two in response_two.context['foods'])
 
-    def test_categorizing_ensure_no_category_deletion_from_different_restaurants(self):
+    def test_categorizing_ensure_no_category_deletion_from_different_restaurants_one_food(self):
         """
         Test that the view function categorizing does not make the category disappear of the food from the other
-        restaurants. This is white-box because the implementation of the ModelMultipleChoiceField will automatically
-        remove options not shown on the page if not careful
+        restaurants. This is white-box becau se the implementation of the ModelMultipleChoiceField will automatically
+        remove options not shown on the page if not careful. This is to test the for loop that checks number
+        of food in form.food_not_in_res with the number of food_not_in_res assuming to be 1.
         """
         self.category.food.add(self.food_three)
+        self.category.restaurant.add(self.restaurant_two)
         # When do client posting this time, the food has to be a list of food.id for MultipleChoiceField
         # the form_data is currently not working....
         form_data = {
-            'food': [str(self.food_one.id), str(self.food_two.id)],  # ID this time for MultipleChoiceField
+            'food': [str(self.food_one.id)],  # ID this time for MultipleChoiceField
         }
         response = self.client.post(self.categorizing_view_func, data=form_data)
         # Assert that food_three from another restaurant still retains the category
         self.assertTrue(self.category in self.food_three.category_set.all())
+
+    def test_categorizing_ensure_no_category_deletion_from_different_restaurants_two_food(self):
+        """
+        Test that the view function categorizing does not make the category disappear of the food from the other
+        restaurants. This is white-box becau se the implementation of the ModelMultipleChoiceField will automatically
+        remove options not shown on the page if not careful. This is to test the for loop that checks number
+        of food in form.food_not_in_res with the number of food_not_in_res assuming to be 2.
+        """
+        self.category.food.add(self.food_three)
+        self.category.food.add(self.food_four)
+        self.category.restaurant.add(self.restaurant_two)
+        # When do client posting this time, the food has to be a list of food.id for MultipleChoiceField
+        # the form_data is currently not working....
+        form_data = {
+            'food': [str(self.food_one.id)],  # ID this time for MultipleChoiceField
+        }
+        response = self.client.post(self.categorizing_view_func, data=form_data)
+        # Assert that food_three from another restaurant still retains the category
+        self.assertTrue(self.category in self.food_three.category_set.all())
+        self.assertTrue(self.category in self.food_four.category_set.all())
+
+    def test_categorizing_ensure_no_category_deletion_from_different_restaurants_many_food(self):
+        """
+        Test that the view function categorizing does not make the category disappear of the food from the other
+        restaurants. This is white-box becau se the implementation of the ModelMultipleChoiceField will automatically
+        remove options not shown on the page if not careful. This is to test the for loop that checks number
+        of food in form.food_not_in_res with the number of food_not_in_res assuming to be more than 2.
+        """
+        self.category.food.add(self.food_three)
+        self.category.food.add(self.food_four)
+        self.category.food.add(self.food_five)
+        self.category.restaurant.add(self.restaurant_two)
+        # When do client posting this time, the food has to be a list of food.id for MultipleChoiceField
+        # the form_data is currently not working....
+        form_data = {
+            'food': [str(self.food_one.id)],  # ID this time for MultipleChoiceField
+        }
+        response = self.client.post(self.categorizing_view_func, data=form_data)
+        # Assert that food_three from another restaurant still retains the category
+        self.assertTrue(self.category in self.food_three.category_set.all())
+        self.assertTrue(self.category in self.food_four.category_set.all())
+        self.assertTrue(self.category in self.food_five.category_set.all())
 
