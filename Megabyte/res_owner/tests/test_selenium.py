@@ -45,6 +45,7 @@ class TestResOwner(LiveServerTestCase):
 
     def test_login_and_adding_restaurant(self):
         self.chrome_webdriver.get(f'{self.live_server_url}/user_stuff/login/')
+        # It seems each function enacts its own database
         self.CustomUserModel.objects.create_user(email='dasdasd@gmail.com',
                                                  username='C4-621 Ayre', is_res_owner=True,
                                                  password='u~Ak$N9$kWKWJE;')
@@ -56,7 +57,7 @@ class TestResOwner(LiveServerTestCase):
         self.chrome_webdriver.find_element(By.NAME, 'submit').click()
         # check result
         time.sleep(1)
-        print(self.chrome_webdriver.current_url)
-        print(f'{self.live_server_url}/home/')
         self.assertTrue(self.chrome_webdriver.current_url == self.chrome_webdriver.current_url)
+        # Go to RestaurantSettings
+
 

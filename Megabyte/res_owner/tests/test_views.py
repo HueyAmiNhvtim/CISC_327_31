@@ -345,6 +345,10 @@ class TestDeleteFood(TestCase):
 
 
 class TestNewCategory(TestCase):
+    """
+    Test the new_category view function. Due to the complexity of the function,
+    white box testing's path coverage is used.
+    """
     def setUp(self):
         """
         Run once to set up non-modified data for all class methods
@@ -380,10 +384,27 @@ class TestNewCategory(TestCase):
             price=20,
             image_path='res_owner/images/worm_sashimi.png'
         )
+        self.food_four = Food.objects.create(
+            name='Worms Specialz', restaurant = self.restaurant,
+            price=10,
+            image_path='res_owner/images/special_worms.png'
+        )
         self.res_hp_view_func = reverse(viewname='res_owner:res_home_page')
 
         self.new_cat_view_func = reverse(viewname='res_owner:new_category', args=[self.restaurant.id])
         self.new_cat_second_res_view_func = reverse(viewname='res_owner:new_category', args=[self.restaurant_two.id])
+
+    def test_exclusive_access(self):
+        """
+        Test that the view function new_category that only allows a restaurant owner to access it.
+        """
+        another_user = self.User.objects.create_user(email='hehehackerboi@gmail.com',
+                                                     username='anon', is_res_owner=True,
+                                                     password='foo')
+        another_client = Client()
+        another_client.login(email='hehehackerboi@gmail.com', password='foo')
+        response = another_client.get(self.new_cat_view_func)
+        self.assertEqual(response.status_code, 404)
 
     def test_new_category_GET(self):
         """
@@ -419,14 +440,52 @@ class TestNewCategory(TestCase):
         self.assertTrue(category in self.food_one.category_set.all())
         self.assertTrue(category in self.food_two.category_set.all())
 
+    def test_new_category_invalid_form(self):
+        """
+        Test that the view function new_category rejects invalid form, which is one that contains invalid food id.
+        """
+        form_data = {
+            'name': 'Snail',
+            'food': ['99'],  # ID this time for MultipleChoiceField
+        }
+        response = self.client.post(self.new_cat_view_func, data=form_data)
+        # Assert that the page is just rendered again upon an invalid form.
+        self.assertEquals(response.status_code, 200)
+        # Assert that the page is just rendered again.
+        self.assertTemplateUsed(response, 'res_owner/new_category.html')
+
+    def test_new_category_invalid_form_different_restaurant(self):
+        """
+        Test that the view function new_category rejects invalid form, which is one that contains invalid food id.
+        This time with another restaurant that has the same category in accordance with path coverage method.
+        """
+        form_data = {
+            'name': 'Snail',
+            'food': [str(self.food_one.id), str(self.food_two.id)],  # ID this time for MultipleChoiceField
+        }
+        response_1 = self.client.post(self.new_cat_view_func, data=form_data)
+
+        form_data = {
+            'name': 'Snail',
+            'food': ['99'],  # ID this time for MultipleChoiceField
+        }
+
+        response_two = self.client.post(self.new_cat_view_func, data=form_data)
+        # Assert that the page is just rendered again upon an invalid form.
+        self.assertEquals(response_two.status_code, 200)
+        # Assert that the page is just rendered again.
+        self.assertTemplateUsed(response_two, 'res_owner/new_category.html')
+
     # No testing duplicate that violates the unique key constraint.
     # since self.client.post basically bypassed through the forms.is_valid()
     # That should be the responsibility of the forms.is_valid() methinks
-    def test_new_category_ensure_no_category_deletion_from_different_restaurants(self):
+
+    def test_new_category_ensure_no_category_deletion_from_different_restaurants_two_food(self):
         """
         Test that the view function new_category does not make the category disappear of the food from the other
         restaurants. This is white-box because the implementation of the ModelMultipleChoiceField will automatically
-        remove options not shown on the page if not careful
+        remove options not shown on the page if not careful. This is to test the for loop that checks number
+        of food in form.food_not_in_res with the number of food_not_in_res assuming to be 2.
         """
         form_data = {
             'name': 'Snail',
@@ -443,6 +502,73 @@ class TestNewCategory(TestCase):
         # Assert that food_one and food_two from another restaurant still retains the category
         self.assertTrue(category in self.food_one.category_set.all())
         self.assertTrue(category in self.food_two.category_set.all())
+
+    def test_new_category_ensure_no_category_deletion_from_different_restaurants_one_food(self):
+        """
+        Test that the view function new_category does not make the category disappear of the food from the other
+        restaurants. This is white-box because the implementation of the ModelMultipleChoiceField will automatically
+        remove options not shown on the page if not careful. This is to test the for loop that checks number
+        of food in form.food_not_in_res with the number of food_not_in_res assuming to be 1.
+        """
+        form_data = {
+            'name': 'Snail',
+            'food': [str(self.food_one.id)],  # ID this time for MultipleChoiceField
+        }
+
+        response_1 = self.client.post(self.new_cat_view_func, data=form_data)
+        form_data_res_two = {
+            'name': 'Snail',
+            'food': [str(self.food_three.id)],  # ID this time for MultipleChoiceField
+        }
+        response_2 = self.client.post(self.new_cat_second_res_view_func, data=form_data_res_two)
+        category = Category.objects.get(name='Snail')
+        # Assert that food_one and food_two from another restaurant still retains the category
+        self.assertTrue(category in self.food_one.category_set.all())
+
+    def test_new_category_ensure_no_category_deletion_from_different_restaurants_no_food(self):
+        """
+        Test that the view function new_category does not make the category disappear from the other
+        restaurants. This is white-box because the implementation of the ModelMultipleChoiceField will automatically
+        remove options not shown on the page if not careful.
+        """
+        form_data = {
+            'name': 'Snail'
+        }
+
+        response_1 = self.client.post(self.new_cat_view_func, data=form_data)
+        form_data_res_two = {
+            'name': 'Snail',
+            'food': [str(self.food_three.id)],  # ID this time for MultipleChoiceField
+        }
+        response_2 = self.client.post(self.new_cat_second_res_view_func, data=form_data_res_two)
+        category = Category.objects.get(name='Snail')
+        # Assert that food_one and food_two from another restaurant still retains the category
+        self.assertTrue(category in self.restaurant.category_set.all())
+
+    def test_new_category_ensure_no_category_deletion_from_different_restaurants_many_food(self):
+        """
+        Test that the view function new_category does not make the category disappear of the food from the other
+        restaurants. This is white-box because the implementation of the ModelMultipleChoiceField will automatically
+        remove options not shown on the page if not careful. This is to test the for loop that checks number
+        of food in form.food_not_in_res with the number of food_not_in_res assuming to be more than 2.
+        """
+        form_data = {
+            'name': 'Snail',
+            'food': [str(self.food_one.id), str(self.food_two.id), str(self.food_four.id)],  # ID this time for MultipleChoiceField
+        }
+
+        response_1 = self.client.post(self.new_cat_view_func, data=form_data)
+        form_data_res_two = {
+            'name': 'Snail',
+            'food': [str(self.food_three.id)],  # ID this time for MultipleChoiceField
+        }
+        response_2 = self.client.post(self.new_cat_second_res_view_func, data=form_data_res_two)
+        category = Category.objects.get(name='Snail')
+        # Assert that food_one and food_two from another restaurant still retains the category
+        self.assertTrue(category in self.food_one.category_set.all())
+        self.assertTrue(category in self.food_two.category_set.all())
+        self.assertTrue(category in self.food_four.category_set.all())
+
 
 
 class TestDeleteCategory(TestCase):

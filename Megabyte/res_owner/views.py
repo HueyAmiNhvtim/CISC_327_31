@@ -142,19 +142,19 @@ def new_category(request, restaurant_id: int):
         # POST request type confirmed, process data
         form = NewCategoryForm(data=request.POST, restaurant_id=restaurant_id)
         # Check if there is an error associated with field name in the form. Cursed, I know.
-        if form.errors.get('name') is not None:
-            # When the duplicate key in Category table exists.
-            if form.errors['name'].as_data():
-                existing_cat_name = form.data['name']
-                this_category = Category.objects.get(name=existing_cat_name)
-                form = NewCategoryForm(
-                    data=request.POST,
-                    restaurant_id=restaurant_id,
-                    instance=this_category
-                )
+        # When there is another key in Category table with the same name exists, implying that there is already a
+        # restaurant with an assigned category and/or its food item(s) also being associated with that category!
+        if form.errors.get('name') is not None and form.errors['name'].as_data():
+            existing_cat_name = form.data['name']
+            this_category = Category.objects.get(name=existing_cat_name)
+            form = NewCategoryForm(
+                data=request.POST,
+                restaurant_id=restaurant_id,
+                instance=this_category
+            )
         if form.is_valid():
             # Save first then add later THIS SEQUENCE IS IMPORTANT!!!!!!!  Do not remove any of the 3 lines,
-            # otherwise the test will flag the heck out of this view function.
+            # otherwise the test will flag the heck out of this view function as errors
             new_category = form.save(commit=False)
             new_category.save()
             new_category.restaurant.add(this_restaurant)
