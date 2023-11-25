@@ -586,6 +586,37 @@ class TestDeleteCategory(TestCase):
             image_path='res_owner/images/rubicon-231.png',
             restaurant_owner=self.user
         )
+        self.restaurant_two = Restaurant.objects.create(
+            name='Balam Fisheries', location='Rubicon-231',
+            image_path='res_owner/images/rubicon-231.png',
+            restaurant_owner=self.user
+        )
+        self.category_to_delete = Category.objects.create(name='Worms')
+        self.second_category = Category.objects.create(name='Scleractinia')
+        self.second_category.restaurant.add(self.restaurant)
+
+        self.res_hp_view_func = reverse(viewname='res_owner:res_home_page')
+        self.delete_cat_view_func = reverse(viewname='res_owner:delete_category', args=[self.category_to_delete.name,
+                                                                                        self.restaurant.id])
+        self.cat_others_view_func = reverse(viewname='res_owner:cat_others', args=[self.restaurant.id])
+
+    def test_exclusive_access(self):
+        """
+        Test that the view function delete_category that only allows a restaurant owner to access it.
+        """
+        another_user = self.User.objects.create_user(email='hehehackerboi@gmail.com',
+                                                     username='anon', is_res_owner=True,
+                                                     password='foo')
+        another_client = Client()
+        another_client.login(email='hehehackerboi@gmail.com', password='foo')
+        response = another_client.get(self.delete_cat_view_func)
+        self.assertEqual(response.status_code, 404)
+
+    def test_delete_category_food_with_a_category(self):
+        """
+        Test that the view function delete_category deletes the category and redirects to the appropriate page.
+        Each food item shown only has the about-to-be-deleted category
+        """
         self.food_one = Food.objects.create(
             name='Coral Worms', restaurant=self.restaurant,
             price=20,
@@ -596,30 +627,149 @@ class TestDeleteCategory(TestCase):
             price=30,
             image_path='res_owner/images/coral_worm.png'
         )
-        self.category_to_delete = Category.objects.create(name='Worms')
         self.category_to_delete.food.add(self.food_one, self.food_two)
         self.category_to_delete.restaurant.add(self.restaurant)
-        self.res_hp_view_func = reverse(viewname='res_owner:res_home_page')
-        self.delete_cat_view_func = reverse(viewname='res_owner:delete_category', args=[self.category_to_delete.name,
-                                                                                        self.restaurant.id])
-        self.cat_others_view_func = reverse(viewname='res_owner:cat_others', args=[self.restaurant.id])
 
-    def test_delete_category_POST_success(self):
-        """
-        Test that the view function delete_category deletes the category and redirects to the appropriate page
-        """
+        category_name = self.category_to_delete.name
         response = self.client.post(self.delete_cat_view_func)
 
         # Assert that upon a successful completion of the code, the page is redirected to the restaurant page
         self.assertRedirects(response, self.res_hp_view_func, status_code=302)
         # Assert that the category actually gets obliterated off the database.
         # Design allows the category to exist in the delete_category....
-        # self.assertFalse(Category.objects.all())
-        # Assert that the food still exists and appears in the Others section instead
+        self.assertFalse(Category.objects.filter(name=category_name))
+        # Assert that the food and restaurant still exists and appears in the Others section instead
+        self.assertFalse(self.restaurant.category_set.filter(name=category_name))
+
         self.assertTrue(Food.objects.filter(name=self.food_one.name) and Food.objects.filter(name=self.food_two.name))
+        self.assertTrue(Restaurant.objects.filter(name=self.restaurant.name))
         response_post_delete = self.client.get(self.cat_others_view_func)
         self.assertTrue(self.food_one in response_post_delete.context['foods'] and
                         self.food_two in response_post_delete.context['foods'])
+
+    def test_delete_category_no_POST_no_delete(self):
+        """
+        Test that the view function delete_category does not delete the category and redirects to the appropriate page
+        when it receives a non POST request
+        """
+        self.category_to_delete.restaurant.add(self.restaurant)
+        response = self.client.get(self.delete_cat_view_func)
+        self.assertRedirects(response, self.res_hp_view_func, status_code=302)
+        self.assertTrue(self.restaurant.category_set.filter(name=self.category_to_delete.name))
+
+    def test_delete_category_no_food(self):
+        """
+        Test that the view function delete_category deletes the category in a restaurant with no food
+        """
+        self.category_to_delete.restaurant.add(self.restaurant)
+        category_name = self.category_to_delete.name
+        response = self.client.post(self.delete_cat_view_func)
+        # Assert that upon a successful completion of the code, the page is redirected to the restaurant page
+        self.assertRedirects(response, self.res_hp_view_func, status_code=302)
+        # Assert that the category actually gets obliterated off the database.
+        # Design allows the category to exist in the delete_category....
+        self.assertFalse(Category.objects.filter(name=category_name))
+        # Assert that the restaurant still exists and appears in the Others section instead
+        self.assertFalse(self.restaurant.category_set.filter(name=category_name))
+        self.assertTrue(Restaurant.objects.filter(name=self.restaurant.name))
+
+    def test_delete_category_food_with_multiple_categories(self):
+        """
+        Test that the view function delete_category deletes the category and redirects to the appropriate page.
+        Each food item shown has the about-to-be-deleted category alongside the another category
+        """
+        self.food_one = Food.objects.create(
+            name='Coral Worms', restaurant=self.restaurant,
+            price=20,
+            image_path='res_owner/images/coral_worm.png'
+        )
+        self.food_two = Food.objects.create(
+            name='Worms Sushi BAWS special', restaurant=self.restaurant,
+            price=30,
+            image_path='res_owner/images/coral_worm.png'
+        )
+        self.category_to_delete.food.add(self.food_one, self.food_two)
+        self.category_to_delete.restaurant.add(self.restaurant)
+
+        self.second_category.food.add(self.food_one, self.food_two)
+        category_name = self.category_to_delete.name
+        response = self.client.post(self.delete_cat_view_func)
+
+        # Assert that upon a successful completion of the code, the page is redirected to the restaurant page
+        self.assertRedirects(response, self.res_hp_view_func, status_code=302)
+        # Assert that the category actually gets obliterated off the database.
+        # Design allows the category to exist in the delete_category....
+        self.assertFalse(Category.objects.filter(name=category_name))
+        # Assert that the food and restaurant still exists and appears in the Others section instead
+        self.assertFalse(self.restaurant.category_set.filter(name=category_name))
+
+        self.assertTrue(Food.objects.filter(name=self.food_one.name) and Food.objects.filter(name=self.food_two.name))
+        self.assertTrue(Restaurant.objects.filter(name=self.restaurant.name))
+        # Assert that the other category is still within the food's category set
+        self.assertTrue(self.food_one.category_set.filter(name=self.second_category.name)
+                        and self.food_two.category_set.filter(name=self.second_category.name))
+        # No checking if it appears in the second category page as
+        # it is not within the responsibility of the delete_category
+
+    def test_delete_category_food_with_no_category(self):
+        """
+        Test that the view function delete_category deletes the category and redirects to the appropriate page.
+        Each food item shown has no categories associated with it.
+        """
+        self.food_one = Food.objects.create(
+            name='Coral Worms', restaurant=self.restaurant,
+            price=20,
+            image_path='res_owner/images/coral_worm.png'
+        )
+        self.food_two = Food.objects.create(
+            name='Worms Sushi BAWS special', restaurant=self.restaurant,
+            price=30,
+            image_path='res_owner/images/coral_worm.png'
+        )
+        self.category_to_delete.restaurant.add(self.restaurant)
+        category_name = self.category_to_delete.name
+        response = self.client.post(self.delete_cat_view_func)
+
+        # Assert that upon a successful completion of the code, the page is redirected to the restaurant page
+        self.assertRedirects(response, self.res_hp_view_func, status_code=302)
+        # Assert that the category actually gets obliterated off the database.
+        # Design allows the category to exist in the delete_category....
+        self.assertFalse(Category.objects.filter(name=category_name))
+        self.assertFalse(self.restaurant.category_set.filter(name=category_name))
+        self.assertTrue(Food.objects.filter(name=self.food_one.name) and Food.objects.filter(name=self.food_two.name))
+        self.assertTrue(Restaurant.objects.filter(name=self.restaurant.name))
+        # No checking if it appears in the second category page as
+        # it is not within the responsibility of the delete_category
+
+    def test_delete_category_two_restaurant_uses_same_category(self):
+        """
+        Test that the view function delete_category deletes the category and redirects to the appropriate page
+        Each food item shown has a category associated with it and there are two restaurants using the same category.
+        """
+
+        self.food_one = Food.objects.create(
+            name='Coral Worms', restaurant=self.restaurant,
+            price=20,
+            image_path='res_owner/images/coral_worm.png'
+        )
+        self.food_two = Food.objects.create(
+            name='Worms Sushi BAWS special', restaurant=self.restaurant,
+            price=30,
+            image_path='res_owner/images/coral_worm.png'
+        )
+        self.category_to_delete.restaurant.add(self.restaurant)
+        self.category_to_delete.restaurant.add(self.restaurant_two)
+        self.category_to_delete.food.add(self.food_one, self.food_two)
+        category_name = self.category_to_delete.name
+
+        response = self.client.post(self.delete_cat_view_func)
+
+        # Assert that upon a successful completion of the code, the page is redirected to the restaurant page
+        self.assertRedirects(response, self.res_hp_view_func, status_code=302)
+        # Assert that the other Restaurant still has that category
+        self.assertTrue(self.restaurant_two.category_set.filter(name=category_name))
+        # Assert that the category still exists in the database
+        self.assertTrue(Category.objects.filter(name=category_name))
 
 
 class TestCategorizing(TestCase):

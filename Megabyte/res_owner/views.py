@@ -179,7 +179,8 @@ def delete_category(request, category_name: str, restaurant_id: int):
     """
     The view function that handles the deletion of a category off a restaurant.
     If the category still has data assigned to it, then simply remove the category off
-    every food in this restaurant. If not, then just delete it off the database.
+    every food in this restaurant.
+    Currently, the deletion of category for empty stuff is currently not working.
     :param request: a HttpRequest object specific to Django
     :param restaurant_id: the id of the restaurant in the Restaurant table
     :param category_name: the name of the category in the Category table
@@ -203,11 +204,10 @@ def delete_category(request, category_name: str, restaurant_id: int):
                     foods_with_same_cat += 1
         # Remove the restaurant associating with this category too
         this_category.restaurant.remove(this_restaurant)
-        # print(this_category.food.all())
         # print(foods_with_same_cat)
         # Basically, this means this category is used only by this restaurant. So delete it off the database also
-        # if foods_with_same_cat == this_category.food.count():
-        #     Category.objects.filter(name=category_name).delete() # DOES NOT WORK FOR NOW...
+        if this_category.restaurant.all().count() == 0:
+            Category.objects.filter(name=category_name).delete()  # DOES NOT WORK FOR NOW...
     return redirect('res_owner:res_home_page')
 
 
