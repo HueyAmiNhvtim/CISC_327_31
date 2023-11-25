@@ -453,6 +453,7 @@ class TestNewCategory(TestCase):
         self.assertEquals(response.status_code, 200)
         # Assert that the page is just rendered again.
         self.assertTemplateUsed(response, 'res_owner/new_category.html')
+        self.assertFalse(self.restaurant.category_set.filter(name='Snail'))
 
     def test_new_category_invalid_form_different_restaurant(self):
         """
@@ -470,11 +471,13 @@ class TestNewCategory(TestCase):
             'food': ['99'],  # ID this time for MultipleChoiceField
         }
 
-        response_two = self.client.post(self.new_cat_view_func, data=form_data)
+        response_two = self.client.post(self.new_cat_second_res_view_func, data=form_data)
         # Assert that no redirects happens.
         self.assertEquals(response_two.status_code, 200)
         # Assert that the page is just rendered again.
         self.assertTemplateUsed(response_two, 'res_owner/new_category.html')
+        self.assertFalse(self.restaurant_two.category_set.filter(name='Snail'))
+        self.assertTrue(self.restaurant.category_set.filter(name='Snail'))
 
     # No testing duplicate that violates the unique key constraint.
     # since self.client.post basically bypassed through the forms.is_valid()
