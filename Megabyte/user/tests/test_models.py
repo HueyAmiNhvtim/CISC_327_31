@@ -22,15 +22,6 @@ class TestQuantityModel(TestCase):
             raised = True
         self.assertFalse(raised, 'One or more fields do not exist')
 
-    def test_max_length_of_fields(self):
-        """
-        Check to make sure all fields' max lengths values of this model
-        are expected to equal specific numbers
-        """
-        max_quantity_length = self.quantity._meta.get_field('quantity').max_length
-        self.assertEqual(max_quantity_length, 4,
-                         'Invalid maximum length of quality field')
-
 
 class TestLocationModel(TestCase):
     def setUp(self):

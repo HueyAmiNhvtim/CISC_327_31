@@ -176,7 +176,7 @@ def add_to_shopping_cart(request, restaurant_id: int, category_name: str, food_i
             for i in this_user.cart:
                 # If the food item already exists in the cart,
                 # add to the quantity of the item
-                if i[4] == str(food_id):
+                if i[4] == food_id:
                     i[3] = str(int(i[3]) + int(food_quantity.quantity))
                     food_in_cart = True
                     break

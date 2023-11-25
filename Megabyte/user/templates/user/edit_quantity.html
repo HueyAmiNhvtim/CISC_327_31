@@ -8,7 +8,7 @@
 <body>
     {% extends 'user/base.html' %}
     {% block content %}
-
+    <h1> Edit Quantity</h1>
     <form action="{% url 'user:edit_quantity' food.id %}" method="post">
         {% csrf_token %}
         <label>How many would you like to buy?</label>
