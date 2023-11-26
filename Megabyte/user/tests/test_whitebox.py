@@ -647,6 +647,11 @@ class TestUser(LiveServerTestCase):
         
         time.sleep(1)
 
+        # Get the current amount of orders
+        view_orders = driver.find_element(By.NAME, 'view_orders_button')
+        view_orders.click()
+        links_1 = driver.find_elements(By.TAG_NAME, 'a')
+
         # Navigate to shopping cart page
         shopping_cart = driver.find_element(By.NAME, 'shopping_cart_button')
         shopping_cart.click()
@@ -667,8 +672,8 @@ class TestUser(LiveServerTestCase):
 
         # check that quantity was not updated
         driver.get('http://127.0.0.1:8000/user/view_orders')
-        links = driver.find_elements(By.TAG_NAME, 'a')
-        self.assertTrue(len(links) == 1, "An order was created")
+        links_2 = driver.find_elements(By.TAG_NAME, 'a')
+        self.assertTrue(len(links_1) == len(links_2), "An order was created")
 
     def test_checkout_valid(self):
         """
@@ -694,6 +699,11 @@ class TestUser(LiveServerTestCase):
         
         time.sleep(1)
 
+        # Get the current amount of orders
+        view_orders = driver.find_element(By.NAME, 'view_orders_button')
+        view_orders.click()
+        links_1 = driver.find_elements(By.TAG_NAME, 'a')
+
         # Navigate to food page
         driver.get('http://127.0.0.1:8000/user/restaurant/1/Fruits/Apple')
         quantity_input = driver.find_element(By.NAME, 'quantity')
@@ -710,11 +720,11 @@ class TestUser(LiveServerTestCase):
         checkout.click()
 
         time.sleep(1)
-        
+
         # Check that the user was redirected
         self.assertTrue(driver.current_url == 'http://127.0.0.1:8000/user/view_orders',
                     "user was not redirected")
 
         # check that an order appeared in the view orders page
-        links = driver.find_elements(By.TAG_NAME, 'a')
-        self.assertTrue(len(links) > 1, "An order was not created")
+        links_2 = driver.find_elements(By.TAG_NAME, 'a')
+        self.assertTrue(len(links_1) < len(links_2), "An order was not created")
