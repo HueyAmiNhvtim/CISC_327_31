@@ -10,10 +10,13 @@
     {% block content %}
     <h1>{{ food.name }}</h1>
     ${{food.price}}
-
+    {% for message in messages %}
+        <a class="close" href="#" data-dismiss="alert">x</a>
+           {{ message }}
+    {% endfor %}
     <form action="{% url 'user:add_to_shopping_cart' restaurant.id category_name food.id %}" method="post">
         {% csrf_token %}
-        <label>How many would you like to buy?</label>
+        <label>How many would you like to buy (max. 100)?</label>
         {{ form.as_div }}
         <button name="add_to_cart_button">Add to cart</button>
     </form>
