@@ -9,7 +9,7 @@ class RegistTest(LiveServerTestCase):
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument("--enable-features=NetworkService")
         self.driver = webdriver.Chrome()
-        self.driver.get('http://127.0.0.1:8000/')
+        self.driver.get(self.live_server_url)
         self.driver.maximize_window()  #
     
     def tearDown(self):
@@ -26,7 +26,7 @@ class RegistTest(LiveServerTestCase):
         browser.find_element(By.NAME, 'password2').send_keys('testpassword')        
         browser.find_element(By.NAME, 'submit').click()
         # check result
-        self.assertEqual(browser.current_url, 'http://127.0.0.1:8000/user/') 
+        self.assertEqual(browser.current_url, f'{self.live_server_url}/user/') 
 
 
     def test_regist_02_res_owner(self):
@@ -49,11 +49,11 @@ class RegistTest(LiveServerTestCase):
         browser.find_element(By.LINK_TEXT, 'Register').click()
         browser.find_element(By.NAME, 'email').send_keys('test111@123.com')
         browser.find_element(By.NAME, 'username').send_keys('test111')
-        browser.find_element(By.NAME, 'password1').send_keys('testpassword')
-        browser.find_element(By.NAME, 'password2').send_keys('testpassword')        
+        browser.find_element(By.NAME, 'password1').send_keys('testpassword1')
+        browser.find_element(By.NAME, 'password2').send_keys('testpassword2')        
         browser.find_element(By.NAME, 'submit').click()
         # check result        
-        self.assertEqual(browser.current_url, 'http://127.0.0.1:8000/register/')  # failure regist, the current url still is 'http://127.0.0.1:8000/register/'
+        self.assertEqual(browser.current_url, f'{self.live_server_url}/register/')  # failure regist, the current url still is 'http://127.0.0.1:8000/register/'
         
 
 
