@@ -196,7 +196,7 @@ class TestUser(LiveServerTestCase):
         assert driver.current_url == 'http://127.0.0.1:8000/user/restaurant/{}/Fruits/Apple'.format(restaurant_1_id)
 
         # Verify that the food page has been loaded correctly
-        assert 'How many would you like to buy? (max. 100)' in driver.page_source
+        assert 'How many would you like to buy (max. 100)?' in driver.page_source
 
         quantity_input = driver.find_element(By.NAME, 'quantity')
         add_to_cart = driver.find_element(By.NAME, 'add_to_cart_button')
