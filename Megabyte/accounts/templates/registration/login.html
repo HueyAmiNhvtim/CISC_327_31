@@ -13,8 +13,8 @@
         <!-- Invoke the login view function to do stuff and render the page -->
         <form action="{% url 'accounts:login' %}" method="post">
           {% csrf_token %}
-          {{ form.as_div }}
-
+          {{ form }}
+          
           <button name="submit">Login</button>
         </form>
     {% endblock content %}

@@ -16,5 +16,4 @@ urlpatterns = [
     path('<int:user_id>/password/',
          views.PasswordsChangeView.as_view(template_name='registration/change_password.html'),
          name='change_password'),
-
 ]

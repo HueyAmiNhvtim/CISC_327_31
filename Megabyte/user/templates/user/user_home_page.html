@@ -14,7 +14,7 @@
         </form>
         <form action="{% url 'user:shopping_cart' %}" method="post">
             {% csrf_token %}
-            <button name="search_button">View Shopping Cart</button>
+            <button name="shopping_cart_button">View Shopping Cart</button>
         </form>
         <form action="{% url 'user:view_orders' %}" method="post">
             {% csrf_token %}

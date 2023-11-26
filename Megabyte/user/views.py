@@ -4,7 +4,7 @@ from res_owner.models import Restaurant, Category, Food
 from .forms import SearchForm, CartForm, OrderForm
 
 from accounts.models import CustomUser
-
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 import datetime
@@ -172,24 +172,39 @@ def add_to_shopping_cart(request, restaurant_id: int, category_name: str, food_i
         form = CartForm(data=request.POST)
         if form.is_valid():
             food_quantity = form.save(commit=False)
-            food_in_cart = False
-            for i in this_user.cart:
-                # If the food item already exists in the cart,
-                # add to the quantity of the item
-                if i[4] == str(food_id):
-                    i[3] = str(int(i[3]) + int(food_quantity.quantity))
-                    food_in_cart = True
-                    break
-            if not food_in_cart:
-                # If the food item is not in the cart already,
-                # add it to the cart
-                this_user.cart.append([this_food.name, this_restaurant.name,
-                                       str(this_food.price),
-                                       food_quantity.quantity, food_id])
-            this_user.save()
-            return redirect('user:shopping_cart')
-    context = {"user": this_user,
-               "range": range(len(this_user.cart["items"]))}
+            if food_quantity.quantity < 1:
+                # If not a valid quantity, send the user back and display 
+                # an error message
+                messages.error(request, 'ERROR: Quantity must be greater than 0.')
+                return redirect('user:food', restaurant_id, category_name, this_food.name)
+            elif food_quantity.quantity > 100:
+                # If not a valid quantity, send the user back and display 
+                # an error message
+                messages.error(request, 'ERROR: Quantity must be less than 101.')
+                return redirect('user:food', restaurant_id, category_name, this_food.name)
+            else:
+                food_in_cart = False
+                for i in this_user.cart:
+                    # If the food item already exists in the cart,
+                    # add to the quantity of the item
+                    if i[4] == food_id:
+                        if int(i[3]) + int(food_quantity.quantity) > 100:
+                            # If the quantity after adding exceeds 100, throw an error
+                            messages.error(request, 'ERROR: Quantity in shopping cart must not exceed 100.')
+                            return redirect('user:food', restaurant_id, category_name, this_food.name)
+                        else:
+                            i[3] = str(int(i[3]) + int(food_quantity.quantity))
+                            food_in_cart = True
+                            break
+                if not food_in_cart:
+                    # If the food item is not in the cart already,
+                    # add it to the cart
+                    this_user.cart.append([this_food.name, this_restaurant.name,
+                                        str(this_food.price),
+                                        food_quantity.quantity, food_id])
+                this_user.save()
+                return redirect('user:shopping_cart')
+    context = {"user": this_user}
     return render(request, 'user/shopping_cart.html', context)
 
 
@@ -230,13 +245,22 @@ def edit_quantity(request, food_id: int):
         # Might have to change it once custom form validation is implemented.
         if form.is_valid():
             new_quantity = form.save(commit=False)
-            for i in range(len(this_user.cart)):
-                # Change the amount of the specified item
-                if int(this_user.cart[i][4]) == food_id:
-                    this_user.cart[i][3] = new_quantity.quantity
-                    this_user.save()
-                    break
-            return redirect('user:shopping_cart')
+            if new_quantity.quantity < 1: 
+                # If the new quantity is invalid, return an error message
+                messages.error(request, "ERROR: New quantity must be greater than 0.")
+                return redirect('user:edit_quantity', food_id)
+            elif new_quantity.quantity > 100: 
+                # If the new quantity is invalid, return an error message
+                messages.error(request, "ERROR: New quantity must be less than 101.")
+                return redirect('user:edit_quantity', food_id)
+            else:
+                for i in range(len(this_user.cart)):
+                    # Change the amount of the specified item
+                    if int(this_user.cart[i][4]) == food_id:
+                        this_user.cart[i][3] = new_quantity.quantity
+                        this_user.save()
+                        break
+                return redirect('user:shopping_cart')
     context = {"user": this_user, "food": this_food, "form": form}
     return render(request, 'user/edit_quantity.html', context)
 
@@ -281,11 +305,15 @@ def checkout(request):
             order_info.user = this_user.id
             order_info.date_and_time = datetime.datetime.now()
             order_info.cart = this_user.cart.copy()
-            order_info.save()
+            if len(order_info.cart) < 1:
+                messages.error(request, "ERROR: Shopping cart is empty.")
+                return redirect('user:shopping_cart')
+            else:                
+                order_info.save()
 
-            # Reset the user's shopping cart
-            this_user.cart = []
-            this_user.save()
+                # Reset the user's shopping cart
+                this_user.cart = []
+                this_user.save()
         return redirect('user:view_orders')
     form = OrderForm()
     # This sends the context to render the view_orders.html

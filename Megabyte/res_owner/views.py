@@ -142,21 +142,23 @@ def new_category(request, restaurant_id: int):
         # POST request type confirmed, process data
         form = NewCategoryForm(data=request.POST, restaurant_id=restaurant_id)
         # Check if there is an error associated with field name in the form. Cursed, I know.
-        if form.errors.get('name') is not None:
-            # When the duplicate key in Category table exists.
-            if form.errors['name'].as_data():
-                existing_cat_name = form.data['name']
-                this_category = Category.objects.get(name=existing_cat_name)
-                form = NewCategoryForm(
-                    data=request.POST,
-                    restaurant_id=restaurant_id,
-                    instance=this_category
-                )
+        # When there is another key in Category table with the same name exists, implying that there is already a
+        # restaurant with an assigned category and/or its food item(s) also being associated with that category!
+        if form.errors.get('name') is not None and form.errors['name'].as_data():
+            existing_cat_name = form.data['name']
+            this_category = Category.objects.get(name=existing_cat_name)
+            form = NewCategoryForm(
+                data=request.POST,
+                restaurant_id=restaurant_id,
+                instance=this_category
+            )
         if form.is_valid():
-            # Save first then add later
+            # Save first then add later THIS SEQUENCE IS IMPORTANT!!!!!!!  Do not remove any of the 3 lines,
+            # otherwise the test will flag the heck out of this view function as errors
             new_category = form.save(commit=False)
             new_category.save()
             new_category.restaurant.add(this_restaurant)
+            form.save_m2m()
             if len(form.food_not_in_res) > 0:
                 existing_cat_name = form.data['name']
                 this_category = Category.objects.get(name=existing_cat_name)
@@ -177,7 +179,8 @@ def delete_category(request, category_name: str, restaurant_id: int):
     """
     The view function that handles the deletion of a category off a restaurant.
     If the category still has data assigned to it, then simply remove the category off
-    every food in this restaurant. If not, then just delete it off the database.
+    every food in this restaurant.
+    Currently, the deletion of category for empty stuff is currently not working.
     :param request: a HttpRequest object specific to Django
     :param restaurant_id: the id of the restaurant in the Restaurant table
     :param category_name: the name of the category in the Category table
@@ -201,11 +204,10 @@ def delete_category(request, category_name: str, restaurant_id: int):
                     foods_with_same_cat += 1
         # Remove the restaurant associating with this category too
         this_category.restaurant.remove(this_restaurant)
-        # print(this_category.food.all())
         # print(foods_with_same_cat)
         # Basically, this means this category is used only by this restaurant. So delete it off the database also
-        # if foods_with_same_cat == this_category.food.count():
-        #     Category.objects.filter(name=category_name).delete() # DOES NOT WORK FOR NOW...
+        if this_category.restaurant.all().count() == 0:
+            Category.objects.filter(name=category_name).delete()  
     return redirect('res_owner:res_home_page')
 
 
@@ -368,6 +370,7 @@ def edit_food(request, food_id: int):
             or a redirect to the home page upon a successful POST request.
     """
     this_food = Food.objects.get(id=food_id)
+    this_restaurant = this_food.restaurant
     # Check to make sure different user cannot enter into other users' pages
     if this_food.restaurant.restaurant_owner != request.user:
         raise Http404
@@ -379,7 +382,7 @@ def edit_food(request, food_id: int):
         # POST request type confirmed, process data
         form = FoodForm(instance=this_food, data=request.POST)
         # Might have to change it once custom form validation is implemented.
-        if form.is_valid():
+        if form.is_valid() and not this_restaurant.food_set.filter(name=request.POST.get('name')):
             form.save()
             return redirect('res_owner:res_home_page')
     # This sends the context to render the edit_restaurant.html
