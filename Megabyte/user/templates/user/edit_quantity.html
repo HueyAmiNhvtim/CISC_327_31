@@ -9,6 +9,10 @@
     {% extends 'user/base.html' %}
     {% block content %}
     <h1> Edit Quantity</h1>
+    {% for message in messages %}
+        <a class="close" href="#" data-dismiss="alert">x</a>
+           {{ message }}
+    {% endfor %}
     <form action="{% url 'user:edit_quantity' food.id %}" method="post">
         {% csrf_token %}
         <label>How many would you like to buy?</label>

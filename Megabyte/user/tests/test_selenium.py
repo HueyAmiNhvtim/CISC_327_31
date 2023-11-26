@@ -224,7 +224,6 @@ class TestUser(LiveServerTestCase):
         assert 'Quantity: 5' in driver.page_source
 
         # Store food id for later
-
         # This is not a good solution and will fail in production
         food_1_id = 1
 
@@ -375,7 +374,7 @@ class TestUser(LiveServerTestCase):
         ##################
 
         # Verify that the user has been redirected to the orders page
-        time.sleep(10)
+        time.sleep(1)
         assert driver.current_url == 'http://127.0.0.1:8000/user/view_orders/{}'.format(order_id)
 
         # Verify that the orders page has been loaded correctly

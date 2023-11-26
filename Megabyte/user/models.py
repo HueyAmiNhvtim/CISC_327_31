@@ -1,12 +1,13 @@
 from django.db import models
 from django.conf import settings
+from django.core.validators import MinValueValidator, MaxValueValidator 
 
 User = settings.AUTH_USER_MODEL
 
 
 class Quantity(models.Model):
     """A model representation of the amount of an item"""
-    quantity = models.PositiveIntegerField()
+    quantity = models.IntegerField()
 
     def __str__(self):
         """Return the quantity"""
