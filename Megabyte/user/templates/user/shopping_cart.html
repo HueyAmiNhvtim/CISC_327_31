@@ -9,6 +9,10 @@
     {% extends 'user/base.html' %}
     {% block content %}
     <h1>Shopping Cart</h1>
+    {% for message in messages %}
+    <a class="close" href="#" data-dismiss="alert">x</a>
+       {{ message }}
+    {% endfor %}
     <ul>
         <!--List of items in shopping cart-->
         {% for food in user.cart %}
