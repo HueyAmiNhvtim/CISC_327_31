@@ -13,9 +13,15 @@ class AccountViewsTest(TestCase):
         )
 
     def test_register_view(self):
+        # White Box Testing Method: Decision Coverage Testing
+        # Test 1: request.method is not 'POST'
         response = self.client.get(reverse('accounts:register'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Register')
+
+        # Test 2: request.method is 'POST'
+        response = self.client.post(reverse('accounts:register'), {'username': 'testuser', 'password1': 'testpassword1', 'password2': 'testpassword'})
+        self.assertEqual(response.status_code, 200)
 
     def test_user_home_page_view(self):
         self.client.login(email='test@example.com', password='testpassword')
@@ -28,9 +34,20 @@ class AccountViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_edit_user_view(self):
+        # White Box Testing Method: Path Testing
+
         self.client.login(email='test@example.com', password='testpassword')
+        # Test 1: request.method is not 'POST'
         response = self.client.get(reverse('accounts:edit_user'))
         self.assertEqual(response.status_code, 200)
+
+        # Test 2: request.method is 'POST', form is not valid
+        response = self.client.post(reverse('accounts:edit_user'), {'username': 'testuser'})
+        self.assertEqual(response.status_code, 200)
+
+        # Test 3: request.method is 'POST', form is valid
+        response = self.client.post(reverse('accounts:edit_user'), {'username': 'testuser2', 'email': 'test2@example.com'})
+        self.assertEqual(response.status_code, 302)
 
     def test_password_change_view(self):
         self.client.login(email='test@example.com', password='testpassword')
