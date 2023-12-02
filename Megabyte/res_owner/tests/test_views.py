@@ -286,7 +286,7 @@ class TestEditFood(TestCase):
 
         # Assert that upon a successful completion of the code, the page is redirected to the homepage
         self.assertRedirects(response, self.res_hp_view_func, status_code=302)
-        # Assert that there is a restaurant associated with the User
+        # Assert that there is a restaurant associated with the food
         self.assertTrue(self.restaurant.food_set.filter(name='Almond Milk'))
 
     def test_edit_food_POST_duplicate(self):
