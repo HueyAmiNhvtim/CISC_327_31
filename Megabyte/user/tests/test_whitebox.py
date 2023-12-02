@@ -652,6 +652,11 @@ class TestUser(LiveServerTestCase):
         view_orders.click()
         links_1 = driver.find_elements(By.TAG_NAME, 'a')
 
+        # Navigate back to the user home page
+        links_1[0].click()
+
+        time.sleep(1)
+
         # Navigate to shopping cart page
         shopping_cart = driver.find_element(By.NAME, 'shopping_cart_button')
         shopping_cart.click()

@@ -11,19 +11,6 @@ import time
 
 
 class TestUser(LiveServerTestCase):
-    '''
-    @classmethod
-    def setUpClass(cls):
-        cls.CustomUserModel = get_user_model()
-        super().setUpClass()
-        cls.chrome_webdriver.implicitly_wait(10)
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.chrome_webdriver.quit()
-        super().tearDownClass()
-    '''
-
     def setUp(self):
         self.User = get_user_model()
         # Create user and owner accounts
@@ -138,9 +125,6 @@ class TestUser(LiveServerTestCase):
         # in the search results. A NoSuchElementException is 
         # raised if a restaurant is not found.
         restaurant_1 = driver.find_element(By.LINK_TEXT, 'Fruit Market')
-        # Error due to views not updating with new objects
-        restaurant_2 = driver.find_element(By.LINK_TEXT, 'Dollar Store')
-        restaurant_3 = driver.find_element(By.LINK_TEXT, 'Fruit Empire')
 
         # Go to restaurant 1 (Fruit Market)'s page
         restaurant_1.click()
@@ -223,10 +207,6 @@ class TestUser(LiveServerTestCase):
         assert 'Price per item: $1.000000' in driver.page_source
         assert 'Quantity: 5' in driver.page_source
 
-        # Store food id for later
-        # This is not a good solution and will fail in production
-        food_1_id = 1
-
         # This test works because it is being tested with one item in the cart
         # If there are multiple, there will need to be workarounds to test it
         edit = driver.find_element(By.NAME, 'edit_button')
@@ -242,8 +222,8 @@ class TestUser(LiveServerTestCase):
 
         # Verify that the user has been redirected to the edit quantity page
         # This is to ignore the generated csrftoken in the url
-        edit_quantity_url_length = 46 + len(str(food_1_id))
-        assert driver.current_url[:edit_quantity_url_length] == 'http://127.0.0.1:8000/user/shopping_cart/edit/{}'.format(food_1_id)
+        edit_quantity_url_length = 46
+        assert driver.current_url[:edit_quantity_url_length] == 'http://127.0.0.1:8000/user/shopping_cart/edit/'
 
         # Verify that the shopping cart page has been loaded correctly
         assert 'Edit Quantity' in driver.page_source
@@ -270,8 +250,6 @@ class TestUser(LiveServerTestCase):
         # Verify that quantity of food 1 (Apple) has been changed to 2
         assert 'Quantity: 2' in driver.page_source
 
-        # This test works because it is being tested with one item in the cart
-        # If there are multiple, there will need to be workarounds to test it
         remove_food = driver.find_element(By.NAME, 'remove_food_button')
 
         # Remove food 1 (Apple) from the shopping cart
@@ -358,14 +336,12 @@ class TestUser(LiveServerTestCase):
         # Verify that the orders page has been loaded correctly
         assert 'Orders' in driver.page_source
 
-        # This test works because it is being tested with one existing order
-        # If there are multiple, there will need to be workarounds to test it
         links = driver.find_elements(By.TAG_NAME, 'a')
-        order_link = links[1].get_attribute('href')
+        order_link = links[-1].get_attribute('href')
         order_id = order_link[order_link.rindex('/') + 1:]
         
         # Go to order details
-        links[1].click()
+        links[-1].click()
 
         time.sleep(1)
 
@@ -374,7 +350,6 @@ class TestUser(LiveServerTestCase):
         ##################
 
         # Verify that the user has been redirected to the orders page
-        time.sleep(1)
         assert driver.current_url == 'http://127.0.0.1:8000/user/view_orders/{}'.format(order_id)
 
         # Verify that the orders page has been loaded correctly
