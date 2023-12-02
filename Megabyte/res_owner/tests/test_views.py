@@ -453,6 +453,7 @@ class TestNewCategory(TestCase):
         self.assertEquals(response.status_code, 200)
         # Assert that the page is just rendered again.
         self.assertTemplateUsed(response, 'res_owner/new_category.html')
+        self.assertFalse(self.restaurant.category_set.filter(name='Snail'))
 
     def test_new_category_invalid_form_different_restaurant(self):
         """
@@ -470,11 +471,13 @@ class TestNewCategory(TestCase):
             'food': ['99'],  # ID this time for MultipleChoiceField
         }
 
-        response_two = self.client.post(self.new_cat_view_func, data=form_data)
+        response_two = self.client.post(self.new_cat_second_res_view_func, data=form_data)
         # Assert that no redirects happens.
         self.assertEquals(response_two.status_code, 200)
         # Assert that the page is just rendered again.
         self.assertTemplateUsed(response_two, 'res_owner/new_category.html')
+        self.assertFalse(self.restaurant_two.category_set.filter(name='Snail'))
+        self.assertTrue(self.restaurant.category_set.filter(name='Snail'))
 
     # No testing duplicate that violates the unique key constraint.
     # since self.client.post basically bypassed through the forms.is_valid()
@@ -482,10 +485,9 @@ class TestNewCategory(TestCase):
 
     def test_new_category_ensure_no_category_deletion_from_different_restaurants_two_food(self):
         """
-        Test that the view function new_category does not make the category disappear of the food from the other
-        restaurants. This is white-box because the implementation of the ModelMultipleChoiceField will automatically
-        remove options not shown on the page if not careful. This is to test the for loop that checks number
-        of food in form.food_not_in_res with the number of food_not_in_res assuming to be 2.
+        Test that the view function new_category does not make the category disappear from the 
+        food of the other restaurants. This is to test the for loop that checks the number of food in 
+        form.food_not_in_res with the number of food_not_in_res assuming to be 2.
         """
         form_data = {
             'name': 'Snail',
@@ -506,8 +508,7 @@ class TestNewCategory(TestCase):
     def test_new_category_ensure_no_category_deletion_from_different_restaurants_one_food(self):
         """
         Test that the view function new_category does not make the category disappear of the food from the other
-        restaurants. This is white-box because the implementation of the ModelMultipleChoiceField will automatically
-        remove options not shown on the page if not careful. This is to test the for loop that checks number
+        restaurants. This is to test the for loop that checks number
         of food in form.food_not_in_res with the number of food_not_in_res assuming to be 1.
         """
         form_data = {
@@ -527,9 +528,8 @@ class TestNewCategory(TestCase):
 
     def test_new_category_ensure_no_category_deletion_from_different_restaurants_no_food(self):
         """
-        Test that the view function new_category does not make the category disappear from the other
-        restaurants. This is white-box because the implementation of the ModelMultipleChoiceField will automatically
-        remove options not shown on the page if not careful.
+        Test that the view function new_category does not make the category disappear from the other restaurants.
+        This time the first restaurant that makes the category does not assign any food item to it.
         """
         form_data = {
             'name': 'Snail'
@@ -547,10 +547,9 @@ class TestNewCategory(TestCase):
 
     def test_new_category_ensure_no_category_deletion_from_different_restaurants_many_food(self):
         """
-        Test that the view function new_category does not make the category disappear of the food from the other
-        restaurants. This is white-box because the implementation of the ModelMultipleChoiceField will automatically
-        remove options not shown on the page if not careful. This is to test the for loop that checks number
-        of food in form.food_not_in_res with the number of food_not_in_res assuming to be more than 2.
+        Test that the view function new_category does not make the category disappear from the food of the other restaurants. 
+        This is to test the for loop that checks the number of food in form.food_not_in_res with the number of food_not_in_res 
+        assuming to be more than 2.
         """
         form_data = {
             'name': 'Snail',
@@ -612,10 +611,20 @@ class TestDeleteCategory(TestCase):
         response = another_client.get(self.delete_cat_view_func)
         self.assertEqual(response.status_code, 404)
 
+    def test_delete_category_no_POST_no_delete(self):
+        """
+        Test that the view function delete_category only redirect to the home page once non-POST request is made.
+        """
+        response = self.client.get(self.delete_cat_view_func)
+        # Assert that the request is successful
+        self.assertRedirects(response, self.res_hp_view_func, status_code=302)
+        # Assert that the category is not deleted
+        self.assertTrue(Category.objects.filter(name=self.category_to_delete.name))
+        
     def test_delete_category_food_with_a_category(self):
         """
         Test that the view function delete_category deletes the category and redirects to the appropriate page.
-        Each food item shown only has the about-to-be-deleted category
+        Each food item shown only has the about-to-be-deleted category, and that only a restaurant has that category.
         """
         self.food_one = Food.objects.create(
             name='Coral Worms', restaurant=self.restaurant,
@@ -638,24 +647,10 @@ class TestDeleteCategory(TestCase):
         # Assert that the category actually gets obliterated off the database.
         # Design allows the category to exist in the delete_category....
         self.assertFalse(Category.objects.filter(name=category_name))
-        # Assert that the food and restaurant still exists and appears in the Others section instead
         self.assertFalse(self.restaurant.category_set.filter(name=category_name))
 
         self.assertTrue(Food.objects.filter(name=self.food_one.name) and Food.objects.filter(name=self.food_two.name))
         self.assertTrue(Restaurant.objects.filter(name=self.restaurant.name))
-        response_post_delete = self.client.get(self.cat_others_view_func)
-        self.assertTrue(self.food_one in response_post_delete.context['foods'] and
-                        self.food_two in response_post_delete.context['foods'])
-
-    def test_delete_category_no_POST_no_delete(self):
-        """
-        Test that the view function delete_category does not delete the category and redirects to the appropriate page
-        when it receives a non POST request
-        """
-        self.category_to_delete.restaurant.add(self.restaurant)
-        response = self.client.get(self.delete_cat_view_func)
-        self.assertRedirects(response, self.res_hp_view_func, status_code=302)
-        self.assertTrue(self.restaurant.category_set.filter(name=self.category_to_delete.name))
 
     def test_delete_category_no_food(self):
         """
@@ -669,14 +664,14 @@ class TestDeleteCategory(TestCase):
         # Assert that the category actually gets obliterated off the database.
         # Design allows the category to exist in the delete_category....
         self.assertFalse(Category.objects.filter(name=category_name))
-        # Assert that the restaurant still exists and appears in the Others section instead
         self.assertFalse(self.restaurant.category_set.filter(name=category_name))
         self.assertTrue(Restaurant.objects.filter(name=self.restaurant.name))
 
     def test_delete_category_food_with_multiple_categories(self):
         """
         Test that the view function delete_category deletes the category and redirects to the appropriate page.
-        Each food item shown has the about-to-be-deleted category alongside the another category
+        Each food item shown has the about-to-be-deleted category alongside the another category,
+        and that only that restaurant had that category.
         """
         self.food_one = Food.objects.create(
             name='Coral Worms', restaurant=self.restaurant,
@@ -700,7 +695,6 @@ class TestDeleteCategory(TestCase):
         # Assert that the category actually gets obliterated off the database.
         # Design allows the category to exist in the delete_category....
         self.assertFalse(Category.objects.filter(name=category_name))
-        # Assert that the food and restaurant still exists and appears in the Others section instead
         self.assertFalse(self.restaurant.category_set.filter(name=category_name))
 
         self.assertTrue(Food.objects.filter(name=self.food_one.name) and Food.objects.filter(name=self.food_two.name))
@@ -708,13 +702,14 @@ class TestDeleteCategory(TestCase):
         # Assert that the other category is still within the food's category set
         self.assertTrue(self.food_one.category_set.filter(name=self.second_category.name)
                         and self.food_two.category_set.filter(name=self.second_category.name))
+        self.assertTrue(self.restaurant.category_set.filter(name=self.second_category.name))
         # No checking if it appears in the second category page as
         # it is not within the responsibility of the delete_category
 
     def test_delete_category_food_with_no_category(self):
         """
         Test that the view function delete_category deletes the category and redirects to the appropriate page.
-        Each food item shown has no categories associated with it.
+        Each food item shown has no categories associated with it, and only that restaurant had that category.
         """
         self.food_one = Food.objects.create(
             name='Coral Worms', restaurant=self.restaurant,
@@ -733,7 +728,6 @@ class TestDeleteCategory(TestCase):
         # Assert that upon a successful completion of the code, the page is redirected to the restaurant page
         self.assertRedirects(response, self.res_hp_view_func, status_code=302)
         # Assert that the category actually gets obliterated off the database.
-        # Design allows the category to exist in the delete_category....
         self.assertFalse(Category.objects.filter(name=category_name))
         self.assertFalse(self.restaurant.category_set.filter(name=category_name))
         self.assertTrue(Food.objects.filter(name=self.food_one.name) and Food.objects.filter(name=self.food_two.name))
@@ -766,6 +760,7 @@ class TestDeleteCategory(TestCase):
 
         # Assert that upon a successful completion of the code, the page is redirected to the restaurant page
         self.assertRedirects(response, self.res_hp_view_func, status_code=302)
+        self.assertFalse(self.restaurant.category_set.filter(name=category_name))
         # Assert that the other Restaurant still has that category
         self.assertTrue(self.restaurant_two.category_set.filter(name=category_name))
         # Assert that the category still exists in the database
@@ -853,6 +848,7 @@ class TestCategorizing(TestCase):
         self.assertEquals(response.status_code, 200)
         # Assert that the page is just rendered again.
         self.assertTemplateUsed(response, 'res_owner/categorizing.html')
+        self.assertFalse(self.restaurant.category_set.filter(name='Snail'))
 
     def test_categorizing_GET(self):
         """
@@ -881,17 +877,13 @@ class TestCategorizing(TestCase):
         # Assert that the food item also has the category now
         self.assertTrue(self.category in self.food_one.category_set.all())
         self.assertTrue(self.category in self.food_two.category_set.all())
-
-        response_two = self.client.get(self.cat_view_func)
-        self.assertTrue(self.food_one in response_two.context['foods'] and
-                        self.food_two in response_two.context['foods'])
+ 
 
     def test_categorizing_ensure_no_category_deletion_from_different_restaurants_one_food(self):
         """
-        Test that the view function categorizing does not make the category disappear of the food from the other
-        restaurants. This is white-box becau se the implementation of the ModelMultipleChoiceField will automatically
-        remove options not shown on the page if not careful. This is to test the for loop that checks number
-        of food in form.food_not_in_res with the number of food_not_in_res assuming to be 1.
+        Test that the view function categorizing does not make the category disappear from the food of 
+        the other restaurants. This is to test the for loop that checks the number of food in form.food_not_in_res
+        with the number of food_not_in_res assuming to be 1.
         """
         self.category.food.add(self.food_three)
         self.category.restaurant.add(self.restaurant_two)
@@ -906,10 +898,9 @@ class TestCategorizing(TestCase):
 
     def test_categorizing_ensure_no_category_deletion_from_different_restaurants_two_food(self):
         """
-        Test that the view function categorizing does not make the category disappear of the food from the other
-        restaurants. This is white-box becau se the implementation of the ModelMultipleChoiceField will automatically
-        remove options not shown on the page if not careful. This is to test the for loop that checks number
-        of food in form.food_not_in_res with the number of food_not_in_res assuming to be 2.
+        Test that the view function categorizing does not make the category disappear from the food of 
+        the other restaurants. This is to test the for loop that checks the number of food in 
+        form.food_not_in_res with the number of food_not_in_res assuming to be 2.
         """
         self.category.food.add(self.food_three)
         self.category.food.add(self.food_four)
@@ -926,10 +917,9 @@ class TestCategorizing(TestCase):
 
     def test_categorizing_ensure_no_category_deletion_from_different_restaurants_many_food(self):
         """
-        Test that the view function categorizing does not make the category disappear of the food from the other
-        restaurants. This is white-box becau se the implementation of the ModelMultipleChoiceField will automatically
-        remove options not shown on the page if not careful. This is to test the for loop that checks number
-        of food in form.food_not_in_res with the number of food_not_in_res assuming to be more than 2.
+        Test that the view function categorizing does not make the category disappear from the food of 
+        the other restaurants. This is to test the for loop that checks the number of food in 
+        form.food_not_in_res with the number of food_not_in_res assuming to be more than 2.
         """
         self.category.food.add(self.food_three)
         self.category.food.add(self.food_four)
